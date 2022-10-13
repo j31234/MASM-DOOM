@@ -122,6 +122,8 @@ WinMain ENDP
 
 .data
 hdc       HDC ?
+memHdc    HDC ?
+memBitmap HBITMAP ?
 oldPen    HGDIOBJ ?
 oldBrush  HGDIOBJ ?
 ps PAINTSTRUCT <>
@@ -152,7 +154,6 @@ COMMENT @
 	    ADDR WindowName, MB_OK
 	  INVOKE PostQuitMessage,0
 	  jmp WinProcExit
-@
 	.ELSEIF eax == WM_PAINT
 	  ; Get HDC
 	  INVOKE BeginPaint, hMainWnd, ADDR ps
@@ -166,15 +167,52 @@ COMMENT @
 	  INVOKE SelectObject, hdc, eax
 	  mov oldBrush, eax
 
-	  INVOKE DrawMain, hdc, ps
+	  INVOKE DrawMain, hdc
 
 	  ; Release HDC and DC pen/brush
 	  INVOKE SelectObject, hdc, oldBrush
 	  INVOKE SelectObject, hdc, oldPen
 	  INVOKE EndPaint, hMainWnd, ADDR ps
 	  jmp WinProcExit
+@
+	.ELSEIF eax == WM_ERASEBKGND
+	  jmp WinProcExit
 	.ELSEIF eax == WM_TIMER
-	  INVOKE InvalidateRect, hMainWnd, NULL, 1
+	  ;INVOKE InvalidateRect, hMainWnd, NULL, 1
+
+	  ; Get HDC
+	  INVOKE GetDC, hMainWnd
+	  mov hdc, eax
+
+	  ; Double Buffering
+	  INVOKE CreateCompatibleDC, hdc
+	  mov memHdc, eax
+	  INVOKE CreateCompatibleBitmap, hdc, WINDOW_WIDTH, WINDOW_HEIGHT
+	  mov memBitmap, eax
+	  INVOKE SelectObject, memHdc, memBitmap
+
+	  ; Set up DC pen / brush
+	  INVOKE GetStockObject, DC_PEN
+	  INVOKE SelectObject, memHdc, eax
+	  mov oldPen, eax
+	  INVOKE GetStockObject, DC_BRUSH
+	  INVOKE SelectObject, memHdc, eax
+	  mov oldBrush, eax
+
+	  ; Background = white
+	  INVOKE BitBlt, memHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdc, 0, 0, WHITENESS
+	  INVOKE DrawMain, memHdc
+
+	  ; Alt the true device context
+	  INVOKE BitBlt, hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memHdc, 0, 0, SRCCOPY
+
+	  ; Release Resources: double buffer, brush/pen, dc
+	  INVOKE DeleteObject, memBitmap
+	  INVOKE DeleteDC, memHdc
+	  INVOKE SelectObject, memHdc, oldBrush
+	  INVOKE SelectObject, memHdc, oldPen
+	  INVOKE ReleaseDC, hMainWnd, hdc
+
 	  jmp WinProcExit
 	.ELSEIF eax == WM_KEYDOWN
 	  .IF wParam == VK_ESCAPE

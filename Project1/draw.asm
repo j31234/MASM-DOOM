@@ -16,6 +16,7 @@ includelib gdi32.lib
 ; Custom Header
 include draw.inc
 include player.inc
+include config.inc
 
 .code
 GetRGB Proc, red:BYTE, green:BYTE, blue:BYTE
@@ -56,7 +57,7 @@ XScale DWORD 80
 YScale DWORD 60
 
 .code
-DrawMain Proc, hdc:HDC, ps:PAINTSTRUCT
+DrawMain Proc, hdc:HDC
   pushad
 
 ; draw map
