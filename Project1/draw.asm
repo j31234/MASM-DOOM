@@ -41,6 +41,10 @@ DrawMain Proc, hdc:HDC
 
   INVOKE DrawMap, hdc
   INVOKE DrawPlayer, hdc
+  INVOKE DrawWall, hdc
+  
+  ; Reset cursor position to the middle of the window
+  INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y
 
   popad
   RET

@@ -45,6 +45,9 @@
     <MASM Include="map.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="config.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="draw.inc">

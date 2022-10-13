@@ -20,19 +20,6 @@ include draw.inc
 ;==================== DATA =======================
 .data
 
-AppLoadMsgTitle BYTE "Application Loaded",0
-AppLoadMsgText  BYTE "This window displays when the WM_CREATE "
-	            BYTE "message is received",0
-
-PopupTitle BYTE "Popup Window",0
-PopupText  BYTE "This window was activated by a "
-	       BYTE "WM_LBUTTONDOWN message",0
-
-GreetTitle BYTE "Main Window Active",0
-GreetText  BYTE "This window is shown immediately after "
-	       BYTE "CreateWindow and UpdateWindow are called.",0
-
-CloseMsg   BYTE "WM_CLOSE message received",0
 
 ErrorTitle  BYTE "Error",0
 WindowName  BYTE "ASM Windows App",0
@@ -81,7 +68,10 @@ WinMain PROC
 	mov hMainWnd,eax
 
 	; Hide Mouse Cursor
-	; INVOKE ShowCursor, 0
+	INVOKE ShowCursor, 0
+
+	; Reset cursor position to the middle of the window
+	INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y
 
 ; If CreateWindowEx failed, display a message & exit.
 	.IF eax == 0
@@ -139,11 +129,13 @@ WinProc PROC,
 ;-----------------------------------------------------
 	mov eax, localMsg
 
+COMMENT @
 	.IF eax == WM_LBUTTONDOWN		; mouse button?
 	  INVOKE MessageBox, hWnd, ADDR PopupText,
 	    ADDR PopupTitle, MB_OK
 	  jmp WinProcExit
-	.ELSEIF eax == WM_TIMER
+@
+	.IF eax == WM_TIMER
 	  ; Get HDC
 	  INVOKE GetDC, hMainWnd
 	  mov hdc, eax

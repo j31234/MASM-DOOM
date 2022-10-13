@@ -29,25 +29,45 @@ speedX DWORD 0
 speedY DWORD 0
 
 .code
-UpdatePlayerState PROC, hdc: HDC
-  LOCAL scale:DWORD, playerDx:DWORD, playerDy:DWORD
-  pushad
-  
+UpdatePlayerAngle PROC
+  LOCAL cursorPos:POINT, dAngle: DWORD
+  INVOKE GetCursorPos, ADDR cursorPos
+
+  ; calc delta angle
+  mov eax, cursorPos.x
+  sub eax, WINDOW_CENTER_X
+  mov dAngle, eax
+
+  ; playerAngle += dAngle * MOUSE_SENSITIVITY / 100
+  ; FINIT
+  FLD playerAngle
+  FILD dAngle
+  FLD MOUSE_SENSITIVITY
+  FMUL
+  FADD
+  FST playerAngle
+  RET
+UpdatePlayerAngle ENDP
+
+UpdatePlayerPosition PROC
+  LOCAL tmp:DWORD, scale:REAL8, playerDx:DWORD, playerDy:DWORD
+
   ; scale speed by PLAYER_SPEED * DELTA_TIME
-  mov eax, PLAYER_SPEED
-  mov edx, DELTA_TIME
-  mul edx
-  mov scale, eax
+  mov tmp, DELTA_TIME
+  FINIT
+  FILD tmp
+  FMUL PLAYER_SPEED
+  FST scale
 
   ; calc sin / cos of speed
   FINIT
   FLD playerAngle
   FCOS
-  FIMUL scale
+  FMUL scale
   FIST speedX
   FLD playerAngle
   FSIN
-  FIMUL scale
+  FMUL scale
   FIST speedY
   
   mov playerDx, 0
@@ -97,13 +117,18 @@ UpdatePlayerState PROC, hdc: HDC
 
   INVOKE CheckPositionValid, playerX, playerY
   .IF al == 0
+    ; invalid position, go back
 	mov eax, playerDx
 	sub playerX, eax
 	mov eax, playerDy
 	sub playerY, eax
   .ENDIF
+  RET
+UpdatePlayerPosition ENDP
 
-  popad
+UpdatePlayerState PROC
+  INVOKE UpdatePlayerAngle
+  INVOKE UpdatePlayerPosition
   RET
 UpdatePlayerState ENDP
 
@@ -112,17 +137,9 @@ playerRect RECT <>
 playerRadius = 5
 .code
 DrawPlayer PROC, hdc: HDC
-  INVOKE UpdatePlayerState, hdc
+  INVOKE UpdatePlayerState
 
-  ; debug: draw player angle
-  mov eax, playerX
-  add eax, speedX
-  add eax, speedX
-  mov ebx, playerY
-  add ebx, speedY
-  add ebx, speedY
-  INVOKE DrawLine, hdc, playerX, playerY, eax, ebx, 00ff0000h
-
+  ; draw player position
   mov eax, playerX
   mov playerRect.left, eax
   sub playerRect.left, playerRadius
@@ -135,7 +152,6 @@ DrawPlayer PROC, hdc: HDC
   mov playerRect.bottom, eax
   add playerRect.bottom, playerRadius
   
-  ; draw player position
   INVOKE SetDCBrushColor, hdc, 000000ffh
   INVOKE Ellipse, hdc, playerRect.left, playerRect.top, playerRect.right, playerRect.bottom
 
