@@ -107,11 +107,14 @@ LOOP_Y:
   RET
 DrawMap ENDP
 
-RayCasting PROC, hdc:HDC, angle:REAL8
+; Casting Ray with angle from (playerX, playerY) to a wall
+; Hit Wall position: 
+RayCasting PROC, angle:REAL8, pWallX:PTR DWORD, pWallY:PTR DWORD, pWallDistance:PTR REAL8
   LOCAL rayX:REAL8, rayY:REAL8
   ; LOCAL rayDx:REAL8, rayDy:REAL8
   LOCAL angleCos:REAL8, angleSin:REAL8
-  LOCAL positionX:DWORD, positionY
+  LOCAL positionX:DWORD, positionY:DWORD
+  LOCAL tmp:DWORD
 
   ; store as float
   FINIT
@@ -147,15 +150,68 @@ RAY_STEP:
   test al, al
   jne RAY_STEP
 
-  INVOKE DrawLine, hdc, playerX, playerY, positionX, positionY, 00ff0000h
+  ; Return values
+  mov eax, positionX
+  mov edi, pWallX
+  mov [edi], eax
+  
+  mov eax, positionY
+  mov edi, pWallY
+  mov [edi], eax
 
+  ; wallDistance = sqrt(deltaX * deltaX + deltaY * deltaY)
+  mov eax, positionX
+  sub eax, playerX
+  imul eax
+  mov tmp, eax
+  FILD tmp
+  mov eax, positionY
+  sub eax, playerY
+  imul eax
+  mov tmp, eax
+  FILD tmp
+  FADD
+  FSQRT
+  mov edi, pWallDistance
+  FST REAL8 PTR [edi]
   RET
 RayCasting ENDP
 
 
+DrawWallColumn PROC, hdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8
+  LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD
+  ; screenHeight = wallHeight * (screenDistance / wallDistance)
+  ; use XScale = wallHeight
+
+  FINIT 
+  FILD XScale
+  FLD screenDistance
+  FLD wallDistance
+  FDIV
+  FMUL
+  FIST screenHeight
+
+  ; columnBegin = WINDOW_HEIGHT / 2 - screenDistance / 2
+  ; columnEnd = WINDOW_HEIGHT / 2 + screenDistance / 2
+  mov eax, WINDOW_HEIGHT
+  shr eax, 1
+  mov ecx, screenHeight
+  shr ecx, 1
+  sub eax, ecx
+  mov columnBegin, eax
+  add eax, ecx
+  add eax, ecx
+  mov columnEnd, eax
+
+  INVOKE DrawLine, hdc, screenX, columnBegin, screenX, columnEnd, 0h
+  
+  RET
+DrawWallColumn ENDP
+
 DrawWall PROC, hdc:HDC
-  LOCAL FOVAngle:REAL8, HalfFOVAngle:REAL8, deltaAngle:REAL8
-  LOCAL tmp:DWORD, angle:REAL8
+  LOCAL FOVAngle:REAL8, HalfFOVAngle:REAL8, deltaAngle:REAL8, screenDistance:REAL8
+  LOCAL tmp:DWORD, angle:REAL8, angleScreenDistance:REAL8
+  LOCAL wallX:DWORD, wallY:DWORD, wallDistance:REAL8
 
   ; FOVAngle = FOV * pi / 180
   FINIT
@@ -173,6 +229,25 @@ DrawWall PROC, hdc:HDC
   FIDIV tmp
   FST deltaAngle
 
+  ; HalfFOVAngle = FOVAngle / 2
+  FLD FOVAngle
+  mov tmp, 2
+  FIDIV tmp
+  FST HalfFOVAngle
+
+  ; screenDistance = (WINDOW_WIDTH / 2) / (sin(HalfFOVAngle) / cos(HalfFOVAngle))
+  ; each ray is a column on screen
+  mov tmp, WINDOW_WIDTH
+  shr tmp, 1
+  FILD tmp
+  FLD HalfFOVAngle
+  FSIN
+  FLD HalfFOVAngle
+  FCOS
+  FDIV
+  FDIV
+  FST screenDistance
+
   ; angle = playerAngle - FOVAngle / 2
   FLD playerAngle
   FLD FOVAngle
@@ -184,7 +259,24 @@ DrawWall PROC, hdc:HDC
   mov ecx, WINDOW_WIDTH
 LOOP_ANGLE:
   push ecx
-  INVOKE RayCasting, hdc, angle
+
+  INVOKE RayCasting, angle, ADDR wallX, ADDR wallY, ADDR wallDistance
+  mov eax, WINDOW_WIDTH
+  sub eax, ecx
+
+  ; angleScreenDistance = screenDistance / cos(angle - playerAngle)
+  FINIT
+  FLD screenDistance
+  FLD angle
+  FLD playerAngle
+  FSUB
+  FCOS
+  FDIV
+  FST angleScreenDistance
+
+  INVOKE DrawWallColumn, hdc, eax, angleScreenDistance, wallDistance
+  ; INVOKE DrawLine, hdc, playerX, playerY, wallX, wallY, 00ff0000h
+
   pop ecx
 
   ; angle += deltaAngle
