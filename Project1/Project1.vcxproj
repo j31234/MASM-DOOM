@@ -71,6 +71,7 @@
   <ItemGroup>
     <MASM Include="draw.asm" />
     <MASM Include="main.asm" />
+    <MASM Include="map.asm" />
     <MASM Include="player.asm" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +87,7 @@
   <ItemGroup>
     <None Include="config.inc" />
     <None Include="draw.inc" />
+    <None Include="map.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

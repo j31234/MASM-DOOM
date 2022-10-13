@@ -143,43 +143,7 @@ WinProc PROC,
 	  INVOKE MessageBox, hWnd, ADDR PopupText,
 	    ADDR PopupTitle, MB_OK
 	  jmp WinProcExit
-
-COMMENT @
-	.ELSEIF eax == WM_CREATE		; create window?
-	  INVOKE MessageBox, hWnd, ADDR AppLoadMsgText,
-	    ADDR AppLoadMsgTitle, MB_OK
-	  jmp WinProcExit
-	.ELSEIF eax == WM_CLOSE		; close window?
-	  INVOKE MessageBox, hWnd, ADDR CloseMsg,
-	    ADDR WindowName, MB_OK
-	  INVOKE PostQuitMessage,0
-	  jmp WinProcExit
-	.ELSEIF eax == WM_PAINT
-	  ; Get HDC
-	  INVOKE BeginPaint, hMainWnd, ADDR ps
-	  mov hdc, eax
-	  ; Set up DC pen
-	  INVOKE GetStockObject, DC_PEN
-	  INVOKE SelectObject, hdc, eax
-	  mov oldPen, eax
-	  ; Set up DC brush
-	  INVOKE GetStockObject, DC_BRUSH
-	  INVOKE SelectObject, hdc, eax
-	  mov oldBrush, eax
-
-	  INVOKE DrawMain, hdc
-
-	  ; Release HDC and DC pen/brush
-	  INVOKE SelectObject, hdc, oldBrush
-	  INVOKE SelectObject, hdc, oldPen
-	  INVOKE EndPaint, hMainWnd, ADDR ps
-	  jmp WinProcExit
-@
-	.ELSEIF eax == WM_ERASEBKGND
-	  jmp WinProcExit
 	.ELSEIF eax == WM_TIMER
-	  ;INVOKE InvalidateRect, hMainWnd, NULL, 1
-
 	  ; Get HDC
 	  INVOKE GetDC, hMainWnd
 	  mov hdc, eax

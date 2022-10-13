@@ -19,6 +19,7 @@ includelib msvcrt.lib
 include player.inc
 include draw.inc
 include config.inc
+include map.inc
 
 .data
 playerX DWORD 150
@@ -93,6 +94,14 @@ UpdatePlayerState PROC, hdc: HDC
   add playerX, eax
   mov eax, playerDy
   add playerY, eax
+
+  INVOKE CheckPositionValid, playerX, playerY
+  .IF al == 0
+	mov eax, playerDx
+	sub playerX, eax
+	mov eax, playerDy
+	sub playerY, eax
+  .ENDIF
 
   popad
   RET

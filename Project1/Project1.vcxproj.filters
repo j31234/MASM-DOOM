@@ -42,12 +42,18 @@
     <MASM Include="player.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="map.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="draw.inc">
       <Filter>头文件</Filter>
     </None>
     <None Include="config.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="map.inc">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>
