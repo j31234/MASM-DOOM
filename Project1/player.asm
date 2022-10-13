@@ -152,8 +152,8 @@ DrawPlayer PROC, hdc: HDC
   mov playerRect.bottom, eax
   add playerRect.bottom, playerRadius
   
-  INVOKE SetDCBrushColor, hdc, 000000ffh
-  INVOKE Ellipse, hdc, playerRect.left, playerRect.top, playerRect.right, playerRect.bottom
+  ;INVOKE SetDCBrushColor, hdc, 000000ffh
+  ;INVOKE Ellipse, hdc, playerRect.left, playerRect.top, playerRect.right, playerRect.bottom
 
   RET
 DrawPlayer ENDP

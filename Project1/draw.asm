@@ -39,8 +39,8 @@ DrawLine ENDP
 DrawMain Proc, hdc:HDC
   pushad
 
-  INVOKE DrawMap, hdc
-  INVOKE DrawPlayer, hdc
+  ; INVOKE DrawMap, hdc
+  INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
   INVOKE DrawWall, hdc
   
   ; Reset cursor position to the middle of the window
