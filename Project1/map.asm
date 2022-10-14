@@ -179,7 +179,8 @@ RayCasting ENDP
 
 
 DrawWallColumn PROC, hdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8
-  LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD
+  LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD, color:DWORD,
+		param1:DWORD, param2:DWORD, tempcolor:BYTE
   ; screenHeight = wallHeight * (screenDistance / wallDistance)
   ; use XScale = wallHeight
 
@@ -203,7 +204,42 @@ DrawWallColumn PROC, hdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:
   add eax, ecx
   mov columnEnd, eax
 
-  INVOKE DrawLine, hdc, screenX, columnBegin, screenX, columnEnd, 0h
+  ; color = color - color / (1 + dist ^ 5 * eps), where eps is a proper small number
+  mov eax, 0ffh
+  mov color, eax  
+  mov eax, 200000
+  mov param1, eax
+  mov eax, 1
+  mov param2, eax
+  FINIT
+  FILD color
+  FILD color
+  FLD wallDistance
+  FLD wallDistance
+  FLD wallDistance
+  FMUL
+  FMUL
+  FILD param1
+  FDIV
+  FLD wallDistance
+  FMUL
+  FILD param1
+  FDIV
+  FILD param2
+  FADD
+  FDIV
+  FSUB
+  FIST color
+
+  mov eax, color
+  mov tempcolor, al
+
+  INVOKE GetRGB, tempcolor, tempcolor, tempcolor
+  mov color, eax
+
+  
+
+  INVOKE DrawLine, hdc, screenX, columnBegin, screenX, columnEnd, color
   
   RET
 DrawWallColumn ENDP
