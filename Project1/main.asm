@@ -33,7 +33,7 @@ msg	      MSG <>
 winRect   RECT <>
 hMainWnd  DWORD ?
 hInstance DWORD ?
-WINDOW_STYLE = WS_POPUP 
+WINDOW_STYLE = WS_POPUP
 
 
 ;=================== CODE =========================
@@ -47,7 +47,12 @@ WinMain PROC
 ; Load the program's icon and cursor.
 	IDI_ICON1 = 101
 	INVOKE LoadIcon, hInstance, IDI_ICON1
-	mov MainWin.hIcon, eax
+	mov MainWin.hIcon, eax 
+
+	IDB_TEXTURE1 = 103
+	INVOKE LoadBitmap, hInstance, IDB_TEXTURE1
+	mov hTexture1, eax
+
 	INVOKE LoadCursor, NULL, IDC_ARROW
 	mov MainWin.hCursor, eax
 
@@ -113,6 +118,7 @@ WinMain ENDP
 .data
 hdc       HDC ?
 memHdc    HDC ?
+drawHdc    HDC ?
 memBitmap HBITMAP ?
 oldPen    HGDIOBJ ?
 oldBrush  HGDIOBJ ?
@@ -147,6 +153,9 @@ COMMENT @
 	  mov memBitmap, eax
 	  INVOKE SelectObject, memHdc, memBitmap
 
+	  INVOKE CreateCompatibleDC, hdc
+	  mov drawHdc, eax
+
 	  ; Set up DC pen / brush
 	  INVOKE GetStockObject, DC_PEN
 	  INVOKE SelectObject, memHdc, eax
@@ -155,9 +164,10 @@ COMMENT @
 	  INVOKE SelectObject, memHdc, eax
 	  mov oldBrush, eax
 
+
 	  ; Background = white
 	  INVOKE BitBlt, memHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdc, 0, 0, WHITENESS
-	  INVOKE DrawMain, memHdc
+	  INVOKE DrawMain, memHdc, drawHdc
 
 	  ; Alt the true device context
 	  INVOKE BitBlt, hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memHdc, 0, 0, SRCCOPY
@@ -168,6 +178,7 @@ COMMENT @
 	  INVOKE SelectObject, memHdc, oldBrush
 	  INVOKE SelectObject, memHdc, oldPen
 	  INVOKE ReleaseDC, hMainWnd, hdc
+	  INVOKE ReleaseDC, hMainWnd, drawHdc
 
 	  jmp WinProcExit
 	.ELSEIF eax == WM_KEYDOWN

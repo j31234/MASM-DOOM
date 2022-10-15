@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />
+    <Image Include="res\texture1.bmp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="config.inc" />

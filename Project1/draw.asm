@@ -36,12 +36,23 @@ DrawLine Proc, hdc:HDC, fromX:DWORD, fromY:DWORD, toX:DWORD, toY:DWORD, RGB: DWO
   RET
 DrawLine ENDP
 
-DrawMain Proc, hdc:HDC
+
+DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nHeight:DWORD,
+				 SrcX:DWORD, SrcY:DWORD, pic:DWORD
+	LOCAL oldObject:HGDIOBJ
+  INVOKE SelectObject, drawdc, pic
+  mov oldObject, eax
+  INVOKE BitBlt, hdc, DestX, DestY, nWidth, nHeight, drawdc, SrcX, SrcY, SRCCOPY
+  INVOKE SelectObject, drawdc, oldObject
+  RET
+DrawBitmap ENDP
+
+DrawMain Proc, hdc:HDC, drawdc:HDC
   pushad
 
   ; INVOKE DrawMap, hdc
   INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
-  INVOKE DrawWall, hdc
+  INVOKE DrawWall, hdc, drawdc
   
   ; Reset cursor position to the middle of the window
   INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y

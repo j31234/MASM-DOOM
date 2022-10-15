@@ -35,6 +35,8 @@ mapData BYTE 1,1,1,1,1,1,1,1,1,1
 XScale DWORD 80
 YScale DWORD 60
 
+; check (X, Y) is wall or not
+; al = 1 if no walls; al = 0 if wall
 .code
 CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
   Local IndexX, IndexY
@@ -49,6 +51,7 @@ CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
   div YScale
   mov IndexY, eax
   
+  ; mapData[IndexX * 10 + IndexY]
   mov eax, IndexX
   mul COLUMN
   add eax, IndexY
@@ -147,8 +150,8 @@ RAY_STEP:
   FIST positionY
 
   INVOKE CheckPositionValid, positionX, positionY
-  test al, al
-  jne RAY_STEP
+  test al, al ; al = 1 if no walls
+  jne RAY_STEP ; jump if no walls
 
   ; Return values
   mov eax, positionX
@@ -178,7 +181,7 @@ RAY_STEP:
 RayCasting ENDP
 
 
-DrawWallColumn PROC, hdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8
+DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8
   LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD, color:DWORD,
 		param1:DWORD, param2:DWORD, tempcolor:BYTE
   ; screenHeight = wallHeight * (screenDistance / wallDistance)
@@ -237,14 +240,15 @@ DrawWallColumn PROC, hdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:
   INVOKE GetRGB, tempcolor, tempcolor, tempcolor
   mov color, eax
 
-  
-
   INVOKE DrawLine, hdc, screenX, columnBegin, screenX, columnEnd, color
+  ;mov eax, columnEnd
+  ;sub eax, columnBegin
+  ;INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, 0, 0, hTexture1
   
   RET
 DrawWallColumn ENDP
 
-DrawWall PROC, hdc:HDC
+DrawWall PROC, hdc:HDC, drawdc:HDC
   LOCAL FOVAngle:REAL8, HalfFOVAngle:REAL8, deltaAngle:REAL8, screenDistance:REAL8
   LOCAL tmp:DWORD, angle:REAL8, angleScreenDistance:REAL8
   LOCAL wallX:DWORD, wallY:DWORD, wallDistance:REAL8
@@ -293,10 +297,11 @@ DrawWall PROC, hdc:HDC
   FST angle
 
   mov ecx, WINDOW_WIDTH
-LOOP_ANGLE:
+LOOP_ANGLE: ;  for ray in range(NUM_RAYS):
   push ecx
 
-  INVOKE RayCasting, angle, ADDR wallX, ADDR wallY, ADDR wallDistance
+  ; invoke ratcasting
+  INVOKE RayCasting, angle, ADDR wallX, ADDR wallY, ADDR wallDistance 
   mov eax, WINDOW_WIDTH
   sub eax, ecx
 
@@ -310,7 +315,8 @@ LOOP_ANGLE:
   FDIV
   FST angleScreenDistance
 
-  INVOKE DrawWallColumn, hdc, eax, angleScreenDistance, wallDistance
+  ; draw wall column
+  INVOKE DrawWallColumn, hdc, drawdc, eax, angleScreenDistance, wallDistance
   ; INVOKE DrawLine, hdc, playerX, playerY, wallX, wallY, 00ff0000h
 
   pop ecx
