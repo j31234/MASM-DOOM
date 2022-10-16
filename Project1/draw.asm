@@ -42,8 +42,7 @@ DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nH
 	LOCAL oldObject:HGDIOBJ
   INVOKE SelectObject, drawdc, pic
   mov oldObject, eax
-  ;INVOKE BitBlt, hdc, DestX, DestY, nWidth, nHeight, drawdc, SrcX, SrcY, SRCCOPY
-  INVOKE StretchBlt, hdc, DestX, DestY, nWidth, nHeight, drawdc, SrcX, SrcY, 2048, 1024, SRCCOPY
+  INVOKE StretchBlt, hdc, DestX, DestY, nWidth, nHeight, drawdc, SrcX, SrcY, nWidth, 256, SRCCOPY
   INVOKE SelectObject, drawdc, oldObject
   RET
 DrawBitmap ENDP
