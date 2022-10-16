@@ -4,11 +4,13 @@ OPTION  CaseMap:None
 
 ; MASM32 Headers
 include windows.inc
+include winmm.inc
 include user32.inc
 include kernel32.inc
 include gdi32.inc
 
 ; MASM32 Library
+includelib winmm.lib
 includelib user32.lib
 includelib kernel32.lib
 includelib gdi32.lib
@@ -24,6 +26,7 @@ include draw.inc
 ErrorTitle  BYTE "Error",0
 WindowName  BYTE "ASM Windows App",0
 className   BYTE "ASMWin",0
+bgmName     BYTE "DoomTheme.wav", 0
 
 ; Define the Application's Window class structure.
 MainWin WNDCLASS <NULL,WinProc,NULL,NULL,NULL,NULL,NULL, \
@@ -95,6 +98,8 @@ WinMain PROC
 ; Frame timer
     INVOKE SetTimer, hMainWnd, NULL, DELTA_TIME, NULL
 
+; Play background music
+	INVOKE PlaySound, ADDR bgmName, NULL, SND_ASYNC OR SND_LOOP OR SND_FILENAME
 
 ; Begin the program's message-handling loop.
 Message_Loop:
