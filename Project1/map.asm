@@ -34,6 +34,7 @@ mapData BYTE 1,1,1,1,1,1,1,1,1,1
 
 XScale DWORD 80
 YScale DWORD 60
+eps REAL8 0.000001
 
 ; check (X, Y) is wall or not
 ; al = 1 if no walls; al = 0 if wall
@@ -62,6 +63,65 @@ CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
 
   RET
 CheckPositionValid ENDP
+
+CheckFloatPositionValid Proc, positionX:REAL8, positionY:REAL8
+  Local tempX:DWORD, tempY:DWORD, temp:WORD
+  FINIT
+  FLD positionX
+  FTST 
+  FSTSW ax
+  SAHF
+  jc EXIT_FUN
+
+  FINIT
+  FLD positionY
+  FTST 
+  FSTSW ax
+  SAHF
+  jc EXIT_FUN
+
+  FINIT
+  FLD positionX
+  FILD ROW
+  FILD XScale
+  FMUL
+  FSUB
+  FTST 
+  FSTSW ax
+  SAHF
+  jnc EXIT_FUN
+
+  FINIT
+  FLD positionY
+  FILD COLUMN
+  FILD YScale
+  FMUL
+  FSUB
+  FTST 
+  FSTSW ax
+  SAHF
+  jnc EXIT_FUN
+
+  ; 向下舍入
+  FINIT
+  FSTCW temp
+  mov bx, temp
+  or bx, 011000000000b
+  mov temp, bx
+  FLDCW temp
+  FLD positionX
+  FIST tempX
+  FLD positionY
+  FIST tempY
+  INVOKE CheckPositionValid, tempX, tempY
+
+  RET
+
+EXIT_FUN:
+  mov eax, 0
+  RET
+CheckFloatPositionValid ENDP
+
 
 DrawMap Proc, hdc:HDC
   LOCAL fromX:DWORD, fromY:DWORD, toX:DWORD, toY:DWORD
@@ -111,21 +171,41 @@ LOOP_Y:
 DrawMap ENDP
 
 ; Casting Ray with angle from (playerX, playerY) to a wall
-; Hit Wall position: 
 RayCasting PROC, angle:REAL8, pWallX:PTR DWORD, pWallY:PTR DWORD, pWallDistance:PTR REAL8
-  LOCAL rayX:REAL8, rayY:REAL8
-  ; LOCAL rayDx:REAL8, rayDy:REAL8
   LOCAL angleCos:REAL8, angleSin:REAL8
-  LOCAL positionX:DWORD, positionY:DWORD
-  LOCAL tmp:DWORD
+  LOCAL mapX:REAL8, mapY:REAL8
+  LOCAL horX:REAL8, horY:REAL8, horDepth:REAL8
+  LOCAL verX:REAL8, verY:REAL8, verDepth:REAL8
+  LOCAL deltaX:REAL8, deltaY:REAL8, deltaDepth:REAL8
+  LOCAL temp:DWORD, tempX:DWORD, tempY:DWORD
+
+  pushad
+
+  ; mapX是XScale的整数倍
+  mov eax, playerX
+  mov edx, 0
+  div XScale
+  mov temp, eax
+  
+  FINIT
+  FILD temp
+  FILD XScale
+  FMUL
+  FST mapX
+
+  mov eax, playerY
+  mov edx, 0
+  div YScale
+  mov temp, eax
+  FINIT
+  FILD temp
+  FILD YScale
+  FMUL
+  FST mapY
+
 
   ; store as float
   FINIT
-  FILD playerX
-  FST rayX
-  FILD playerY
-  FST rayY
-
   ; calc sin/cos
   FLD angle
   FCOS
@@ -133,53 +213,200 @@ RayCasting PROC, angle:REAL8, pWallX:PTR DWORD, pWallY:PTR DWORD, pWallDistance:
   FLD angle
   FSIN
   FST angleSin
-  
 
-RAY_STEP:
+  ;;;;;;;;;; horizontal
+
+  ; 查看sin的正负
   FINIT
-  FLD rayX
-  FADD angleCos
-  FST rayX
-  FLD rayY
-  FADD angleSin
-  FST rayY
+  FLD angleSin
+  FTST 
+  FSTSW ax
+  SAHF
+  jnc SIN_POSITIVE
+  jmp SIN_NEGATIVE
 
-  FLD rayX
-  FIST positionX
-  FLD rayY
-  FIST positionY
-
-  INVOKE CheckPositionValid, positionX, positionY
-  test al, al ; al = 1 if no walls
-  jne RAY_STEP ; jump if no walls
-
-  ; Return values
-  mov eax, positionX
-  mov edi, pWallX
-  mov [edi], eax
-  
-  mov eax, positionY
-  mov edi, pWallY
-  mov [edi], eax
-
-  ; wallDistance = sqrt(deltaX * deltaX + deltaY * deltaY)
-  mov eax, positionX
-  sub eax, playerX
-  imul eax
-  mov tmp, eax
-  FILD tmp
-  mov eax, positionY
-  sub eax, playerY
-  imul eax
-  mov tmp, eax
-  FILD tmp
+SIN_POSITIVE:
+  FINIT
+  FLD mapY
+  FILD YScale
   FADD
-  FSQRT
-  mov edi, pWallDistance
-  FST REAL8 PTR [edi]
+  FST horY
+  FILD YScale
+  FST deltaY
+  jmp SIN_EXIT
+SIN_NEGATIVE:
+  FINIT
+  FLD mapY
+  FLD eps
+  FSUB
+  FST horY
+  FILD YScale
+  FCHS
+  FST deltaY
+  jmp SIN_EXIT
+SIN_EXIT:
+  ;depth_hor = (y_hor - oy) / sin_a
+  FINIT
+  FLD horY
+  FILD playerY
+  FSUB
+  FLD angleSin
+  FDIV
+  FST horDepth
+
+  ;x_hor = ox + depth_hor * cos_a
+  FINIT
+  FLD horDepth
+  FLD angleCos
+  FMUL
+  FILD playerX
+  FADD
+  FST horX
+  
+  ;delta_depth = dy / sin_a
+  FINIT
+  FLD deltaY
+  FLD angleSin 
+  FDIV
+  FST deltaDepth
+  
+  ;dx = delta_depth * cos_a
+  FINIT
+  FLD deltaDepth
+  FLD angleCos
+  FMUL
+  FST deltaX
+  
+  INVOKE CheckFloatPositionValid, horX, horY
+.WHILE al == 1
+  FINIT
+  FLD horX
+  FLD deltaX
+  FADD
+  FST horX
+  FLD horY
+  FLD deltaY
+  FADD
+  FST horY
+  FLD horDepth
+  FLD deltaDepth
+  FADD
+  FST horDepth  
+
+  INVOKE CheckFloatPositionValid, horX, horY
+.ENDW
+
+  ;test al, al ; al = 1 if no walls
+  ;jne LOOP_COLUMN ; jump if no walls
+
+
+;;;;;;;;;;;;;; vertical
+  FINIT
+  FLD angleCos
+  FTST 
+  FSTSW ax
+  SAHF
+  jnc COS_POSITIVE
+  jmp COS_NEGATIVE
+
+COS_POSITIVE:
+  FINIT
+  FLD mapX
+  FILD XScale
+  FADD
+  FST verX
+  FILD XScale
+  FST deltaX
+  jmp COS_EXIT
+COS_NEGATIVE:
+  FINIT
+  FLD mapX
+  FLD eps
+  FSUB
+  FST verX
+  FILD XScale
+  FCHS
+  FST deltaX
+  jmp COS_EXIT
+COS_EXIT:
+  ;depth_vert = (x_vert - ox) / cos_a
+  FINIT
+  FLD verX
+  FILD playerX
+  FSUB
+  FLD angleCos
+  FDIV
+  FST verDepth
+  
+  FINIT
+  ;y_vert = oy + depth_vert * sin_a
+  FLD verDepth
+  FLD angleSin
+  FMUL
+  FILD playerY
+  FADD
+  FST verY
+  
+  ;delta_depth = dx / cos_a
+  FINIT
+  FLD deltaX
+  FLD angleCos 
+  FDIV
+  FST deltaDepth
+  
+  ;dy = delta_depth * sin_a
+  FINIT
+  FLD deltaDepth
+  FLD angleSin
+  FMUL
+  FST deltaY
+
+  INVOKE CheckFloatPositionValid, verX, verY
+.WHILE al == 1
+;LOOP_ROW:  
+  FINIT
+  FLD verX
+  FLD deltaX
+  FADD
+  FST verX
+  FLD verY
+  FLD deltaY
+  FADD
+  FST verY
+  FLD verDepth
+  FLD deltaDepth
+  FADD
+  FST verDepth
+
+  INVOKE CheckFloatPositionValid, verX, verY
+  ;test al, al ; al = 1 if no walls
+  ;jne LOOP_ROW ; jump if no walls
+.ENDW
+
+  FINIT
+  FLD verDepth
+  FLD horDepth
+  FCOM
+  FSTSW ax
+  SAHF
+  jc verGhor
+  jmp verLhor
+verGhor: 
+  FINIT
+  FLD horDepth
+  mov esi, pWallDistance
+  FST REAL8 PTR [esi]
+  jmp RAY_EXIT
+verLhor: 
+  FINIT
+  FLD verDepth
+  mov esi, pWallDistance
+  FST REAL8 PTR [esi]
+  jmp RAY_EXIT
+RAY_EXIT:
+  popad
   RET
 RayCasting ENDP
-
 
 DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8
   LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD, color:DWORD,
@@ -301,7 +528,7 @@ LOOP_ANGLE: ;  for ray in range(NUM_RAYS):
   push ecx
 
   ; invoke ratcasting
-  INVOKE RayCasting, angle, ADDR wallX, ADDR wallY, ADDR wallDistance 
+  INVOKE RayCasting, angle, ADDR wallX, ADDR wallY, ADDR wallDistance
   mov eax, WINDOW_WIDTH
   sub eax, ecx
 
