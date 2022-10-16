@@ -132,6 +132,13 @@ DrawLine ENDP
 
   - 得到墙在屏幕上的投影高度`screenHeight`后，只需要调用`DrawLine`函数，在列$i$的中心画一条长度为`screenHeight`的垂直线（从`(i, WINDOW_HEIGHT / 2 - screenHeight / 2)`到`(i, WINDOW_HEIGHT / 2 + screenHeight / 2)`）后，即可完成一帧画面中一列像素的渲染。
 
+- 墙体距离效果是通过上述计算出的`wallDistance`而实现的，欲实现远处墙体变灰，我们只需要使其颜色（RGB每个通道的值，白色为0xff）通过如下经验公式进行修正：
+
+	- $$
+      color = color -  color\times\frac{1}{1+\alpha \times wallDistance^5}
+      $$
+    - 其中参数$\alpha$经过测试，取$4\times 10^6$能够取得令人满意的效果
+
 - 完成一帧画面的绘制
 
 借助于简易版 Ray Casting 算法，可以渲染墙体的伪 3D 画面。由于该算法假设了玩家的视线平行于地面，玩家视角只能左右移动，不能仰视或俯视。
@@ -147,6 +154,8 @@ DrawLine ENDP
 计划使用同样的接口，在未来为玩家移动/开火/击中等添加音效，增强游戏的互动感与打击感。
 
 ### 贴图（工作中）
+
+贴图即在上述黑色墙体的基础上加上墙的皮肤，由于贴图的长宽与位置都已知，其难点主要在于计算墙体图片的offset，即计算出屏幕上一条贴图带应当位于原图的什么偏移位置。offset的计算同样依赖于ray-casting计算出的ray与墙体的交点坐标，offset可通过交点坐标在游戏棋盘大格上的偏移量计算得出。
 
 
 
