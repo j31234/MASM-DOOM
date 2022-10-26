@@ -638,7 +638,21 @@ LOOP_ANGLE: ;  for ray in range(NUM_RAYS):
   FLD angle
   FADD deltaAngle
   FST angle
-  LOOP LOOP_ANGLE
+
+  mov eax, WINDOW_WIDTH / 2
+  sub eax, ecx
+  mov tmp, eax
+  FINIT
+  FILD tmp
+  FLD screenDistance
+  FPATAN
+  FADD playerAngle
+  FST angle
+
+  sub ecx, 1
+  test ecx, ecx
+  jne LOOP_ANGLE
+  ; LOOP LOOP_ANGLE
 
   RET
 DrawWall ENDP
