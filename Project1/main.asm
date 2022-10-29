@@ -68,6 +68,10 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_BACKGROUND
 	mov hBackground, eax
 
+	IDB_NPC1 = 111
+	INVOKE LoadBitmap, hInstance, IDB_NPC1
+	mov hNPC1, eax
+
 	INVOKE LoadCursor, NULL, IDC_ARROW
 	mov MainWin.hCursor, eax
 

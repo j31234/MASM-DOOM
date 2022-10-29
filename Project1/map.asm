@@ -33,7 +33,7 @@ mapData BYTE 1,1,1,1,1,1,1,1,1,1
 		BYTE 1,1,1,1,1,1,1,1,1,1
 
 XScale DWORD 80
-YScale DWORD 60
+YScale DWORD 80
 eps REAL8 0.000001
 
 ; check (X, Y) is wall or not

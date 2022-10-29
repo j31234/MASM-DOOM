@@ -74,6 +74,7 @@
     <MASM Include="main.asm" />
     <MASM Include="map.asm" />
     <MASM Include="player.asm" />
+    <MASM Include="sprite.asm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.inc" />
@@ -84,7 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />
-    <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\caco.bmp" />
     <Image Include="res\sky.bmp" />
     <Image Include="res\texture1.bmp" />
     <Image Include="res\texture2.bmp" />
@@ -94,6 +95,7 @@
     <None Include="config.inc" />
     <None Include="draw.inc" />
     <None Include="map.inc" />
+    <None Include="sprite.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

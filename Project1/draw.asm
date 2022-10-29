@@ -18,6 +18,7 @@ include draw.inc
 include player.inc
 include map.inc
 include config.inc
+include sprite.inc
 
 .code
 GetRGB Proc, red:BYTE, green:BYTE, blue:BYTE
@@ -55,7 +56,7 @@ DrawBackground Proc, hdc:HDC, drawdc:HDC, SrcX:DWORD, SrcY:DWORD
   mov temp, 2
   FIMUL temp
   FDIV
-  mov temp, 900
+  mov temp, BACKGOUND_WIDTH
   FIMUL temp
   FCHS
   FIST temp
@@ -63,23 +64,23 @@ DrawBackground Proc, hdc:HDC, drawdc:HDC, SrcX:DWORD, SrcY:DWORD
   mov edx, 0
   mov eax, temp
   cdq
-  mov ebx, 900
+  mov ebx, BACKGOUND_WIDTH
   idiv ebx
   mov temp, edx
 
   
   INVOKE SelectObject, drawdc, hBackground
   mov oldObject, eax
-  INVOKE StretchBlt, hdc, temp, 0, 900, 300, drawdc, SrcX, SrcY, 900, 300, SRCCOPY
+  INVOKE StretchBlt, hdc, temp, 0, BACKGOUND_WIDTH, BACKGOUND_HEIGHT, drawdc, SrcX, SrcY, BACKGOUND_WIDTH, BACKGOUND_HEIGHT, SRCCOPY
   mov eax, temp
   cmp eax, 0
   jl ADD_WIDTH
-  sub eax, 900
+  sub eax, BACKGOUND_WIDTH
   jmp END_ADD
 ADD_WIDTH:
-    add eax, 900
+    add eax, BACKGOUND_WIDTH
 END_ADD:
-  INVOKE StretchBlt, hdc, eax, 0, 900, 300, drawdc, SrcX, SrcY, 900, 300, SRCCOPY
+  INVOKE StretchBlt, hdc, eax, 0, BACKGOUND_WIDTH, 300, drawdc, SrcX, SrcY, BACKGOUND_WIDTH, 300, SRCCOPY
   INVOKE SelectObject, drawdc, oldObject
   RET
 DrawBackground ENDP
@@ -101,6 +102,7 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   INVOKE DrawBackground, hdc, drawdc, 0, 0
   INVOKE DrawFloor, hdc
   INVOKE DrawWall, hdc, drawdc
+  INVOKE GetSprite, hdc, drawdc, 500, 500
   
   ; Reset cursor position to the middle of the window
   INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y

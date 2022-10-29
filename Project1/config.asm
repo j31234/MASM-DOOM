@@ -11,5 +11,6 @@ hTexture1 DWORD ?
 hTexture2 DWORD ?
 hTexture3 DWORD ?
 hBackground DWORD ?
+hNPC1 DWORD ?
 
 END

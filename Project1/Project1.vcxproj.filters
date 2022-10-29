@@ -43,7 +43,7 @@
     <Image Include="res\texture3.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\bitmap1.bmp">
+    <Image Include="res\caco.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
@@ -63,6 +63,9 @@
     <MASM Include="config.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="sprite.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="draw.inc">
@@ -72,6 +75,9 @@
       <Filter>头文件</Filter>
     </None>
     <None Include="map.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="sprite.inc">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>

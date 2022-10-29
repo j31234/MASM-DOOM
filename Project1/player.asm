@@ -24,7 +24,7 @@ include map.inc
 .data
 playerX DWORD 150
 playerY DWORD 150
-playerAngle REAL8 -0.785
+playerAngle REAL8 -0.0
 speedX DWORD 0
 speedY DWORD 0
 
