@@ -47,11 +47,59 @@ DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nH
   RET
 DrawBitmap ENDP
 
+DrawBackground Proc, hdc:HDC, drawdc:HDC, SrcX:DWORD, SrcY:DWORD
+	LOCAL oldObject:HGDIOBJ, temp: SDWORD
+  FINIT
+  FLD playerAngle
+  FLDPI
+  mov temp, 2
+  FIMUL temp
+  FDIV
+  mov temp, 900
+  FIMUL temp
+  FCHS
+  FIST temp
+
+  mov edx, 0
+  mov eax, temp
+  cdq
+  mov ebx, 900
+  idiv ebx
+  mov temp, edx
+
+  
+  INVOKE SelectObject, drawdc, hBackground
+  mov oldObject, eax
+  INVOKE StretchBlt, hdc, temp, 0, 900, 300, drawdc, SrcX, SrcY, 900, 300, SRCCOPY
+  mov eax, temp
+  cmp eax, 0
+  jl ADD_WIDTH
+  sub eax, 900
+  jmp END_ADD
+ADD_WIDTH:
+    add eax, 900
+END_ADD:
+  INVOKE StretchBlt, hdc, eax, 0, 900, 300, drawdc, SrcX, SrcY, 900, 300, SRCCOPY
+  INVOKE SelectObject, drawdc, oldObject
+  RET
+DrawBackground ENDP
+
+DrawFloor Proc, hdc:HDC
+	LOCAL color:DWORD
+  INVOKE GetRGB, 160, 160, 160
+  mov color, eax
+  INVOKE SetDCBrushColor, hdc, color
+  INVOKE Rectangle, hdc, 0, WINDOW_HALF_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT
+  RET
+DrawFloor ENDP
+
 DrawMain Proc, hdc:HDC, drawdc:HDC
   pushad
 
   ; INVOKE DrawMap, hdc
   INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
+  INVOKE DrawBackground, hdc, drawdc, 0, 0
+  INVOKE DrawFloor, hdc
   INVOKE DrawWall, hdc, drawdc
   
   ; Reset cursor position to the middle of the window

@@ -84,8 +84,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />
+    <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\sky.bmp" />
     <Image Include="res\texture1.bmp" />
     <Image Include="res\texture2.bmp" />
+    <Image Include="res\texture3.bmp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="config.inc" />

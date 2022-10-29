@@ -37,6 +37,15 @@
     <Image Include="res\texture2.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\sky.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\texture3.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\bitmap1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="main.asm">

@@ -26,10 +26,10 @@ mapData BYTE 1,1,1,1,1,1,1,1,1,1
 		BYTE 1,0,0,0,2,0,0,0,0,1
 		BYTE 1,0,0,0,2,0,1,1,1,1
 		BYTE 1,0,0,0,0,0,0,0,0,1
-		BYTE 1,2,2,2,0,1,1,1,0,1
-		BYTE 1,0,0,0,0,1,0,0,0,1
-		BYTE 1,0,0,0,0,1,0,0,0,1
-		BYTE 1,0,0,0,0,1,0,0,0,1
+		BYTE 1,2,2,2,0,3,1,1,0,1
+		BYTE 1,0,0,0,0,3,0,0,0,1
+		BYTE 1,0,0,0,0,3,0,0,0,1
+		BYTE 1,0,0,0,0,3,0,0,0,1
 		BYTE 1,1,1,1,1,1,1,1,1,1
 
 XScale DWORD 80
@@ -37,7 +37,7 @@ YScale DWORD 60
 eps REAL8 0.000001
 
 ; check (X, Y) is wall or not
-; al = 1 if no walls; al = 0 if wall
+; al = 0, if no walls; else, if wall
 .code
 CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
   Local IndexX, IndexY
@@ -115,7 +115,7 @@ CheckFloatPositionValid Proc, positionX:REAL8, positionY:REAL8
   INVOKE CheckPositionValid, tempX, tempY
   RET
 EXIT_FUN:
-  mov eax, 1
+  mov eax, 1; TODO: now the edge texture type fix to 1
   RET
 CheckFloatPositionValid ENDP
 
@@ -573,8 +573,12 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
   mov ebx, textureType
   .IF ebx == 1
 	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture1
-  .ELSE
-	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture2
+  .ELSE 
+	.IF ebx == 2
+		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture2
+	.ELSE
+		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture3
+	.ENDIF
   .ENDIF
   
   RET

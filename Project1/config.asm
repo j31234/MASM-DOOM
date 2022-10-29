@@ -9,5 +9,7 @@ MOUSE_SENSITIVITY REAL8 0.002
 PLAYER_SPEED REAL8 0.5
 hTexture1 DWORD ?
 hTexture2 DWORD ?
+hTexture3 DWORD ?
+hBackground DWORD ?
 
 END
