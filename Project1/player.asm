@@ -116,7 +116,7 @@ UpdatePlayerPosition PROC
   add playerY, eax
 
   INVOKE CheckPositionValid, playerX, playerY
-  .IF al == 0
+  .IF al != 0
     ; invalid position, go back
 	mov eax, playerDx
 	sub playerX, eax

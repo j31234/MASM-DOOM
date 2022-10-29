@@ -22,11 +22,11 @@ include config.inc
 ROW DWORD 10
 COLUMN DWORD 10
 mapData BYTE 1,1,1,1,1,1,1,1,1,1
-        BYTE 1,0,0,0,1,0,0,0,0,1
-		BYTE 1,0,0,0,1,0,0,0,0,1
-		BYTE 1,0,0,0,1,0,1,1,1,1
+        BYTE 1,0,0,0,2,0,0,0,0,1
+		BYTE 1,0,0,0,2,0,0,0,0,1
+		BYTE 1,0,0,0,2,0,1,1,1,1
 		BYTE 1,0,0,0,0,0,0,0,0,1
-		BYTE 1,1,1,1,0,1,1,1,0,1
+		BYTE 1,2,2,2,0,1,1,1,0,1
 		BYTE 1,0,0,0,0,1,0,0,0,1
 		BYTE 1,0,0,0,0,1,0,0,0,1
 		BYTE 1,0,0,0,0,1,0,0,0,1
@@ -59,7 +59,6 @@ CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
   add eax, offset mapData
 
   mov al, [eax]
-  xor al, 1
 
   RET
 CheckPositionValid ENDP
@@ -116,7 +115,7 @@ CheckFloatPositionValid Proc, positionX:REAL8, positionY:REAL8
   INVOKE CheckPositionValid, tempX, tempY
   RET
 EXIT_FUN:
-  mov eax, 0
+  mov eax, 1
   RET
 CheckFloatPositionValid ENDP
 
@@ -169,7 +168,7 @@ LOOP_Y:
 DrawMap ENDP
 
 ; Casting Ray with angle from (playerX, playerY) to a wall
-RayCasting PROC, angle:REAL8, pWallX:PTR DWORD, pWallY:PTR DWORD, pWallDistance:PTR REAL8, pOffset:PTR REAL8
+RayCasting PROC, angle:REAL8, pWallX:PTR DWORD, pWallY:PTR DWORD, pWallDistance:PTR REAL8, pOffset:PTR REAL8, pTextureType: PTR DWORD
   LOCAL angleCos:REAL8, angleSin:REAL8
   LOCAL mapX:REAL8, mapY:REAL8
   LOCAL horX:REAL8, horY:REAL8, horDepth:REAL8
@@ -178,6 +177,7 @@ RayCasting PROC, angle:REAL8, pWallX:PTR DWORD, pWallY:PTR DWORD, pWallDistance:
   LOCAL temp:DWORD, tempX:DWORD, tempY:DWORD, tempw:WORD
   LOCAL tempf1:REAL8, tempf2:REAL8
   LOCAL sinpositive:DWORD, cospositive:DWORD
+  LOCAL horTextureType:DWORD, verTextureType:DWORD
 
   pushad
 
@@ -281,8 +281,9 @@ SIN_EXIT:
   FMUL
   FST deltaX
   
+  xor eax, eax
   INVOKE CheckFloatPositionValid, horX, horY
-.WHILE al == 1
+.WHILE al == 0
   FINIT
   FLD horX
   FLD deltaX
@@ -299,8 +300,10 @@ SIN_EXIT:
 
   INVOKE CheckFloatPositionValid, horX, horY
 .ENDW
-
-  ;test al, al ; al = 1 if no walls
+  xor ebx, ebx
+  mov bl, al
+  mov horTextureType, ebx
+  ;test al, al ; al = 0 if no walls
   ;jne LOOP_COLUMN ; jump if no walls
 
 
@@ -369,8 +372,9 @@ COS_EXIT:
   FMUL
   FST deltaY
 
+  xor eax, eax
   INVOKE CheckFloatPositionValid, verX, verY
-.WHILE al == 1
+.WHILE al == 0
 ;LOOP_ROW:  
   FINIT
   FLD verX
@@ -390,6 +394,9 @@ COS_EXIT:
   ;test al, al ; al = 1 if no walls
   ;jne LOOP_ROW ; jump if no walls
 .ENDW
+  xor ebx, ebx
+  mov bl, al
+  mov verTextureType, ebx
 
   FINIT
   FLD verDepth
@@ -405,6 +412,9 @@ verGhor:
   mov esi, pWallDistance
   FST REAL8 PTR [esi]
 
+  mov eax, horTextureType
+  mov esi, pTextureType
+  mov [esi], eax
   FINIT
   FSTCW tempw
   mov bx, tempw
@@ -445,8 +455,13 @@ verLhor:
   FLD verDepth
   mov esi, pWallDistance
   FST REAL8 PTR [esi]
+  mov eax, verTextureType
+  mov esi, pTextureType
+  mov [esi], eax
 
   FINIT
+
+
   FSTCW tempw
   mov bx, tempw
   or bx, 011000000000b
@@ -488,7 +503,7 @@ RAY_EXIT:
   RET
 RayCasting ENDP
 
-DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8, textureOffset:REAL8
+DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8, textureOffset:REAL8, textureType:DWORD
   LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD, color:DWORD,
 		param1:DWORD, param2:DWORD, tempcolor:BYTE, tempoffset:DWORD
   ; screenHeight = wallHeight * (screenDistance / wallDistance)
@@ -555,7 +570,12 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
   FILD XScale
   FMUL
   FIST tempoffset
-  INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture1
+  mov ebx, textureType
+  .IF ebx == 1
+	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture1
+  .ELSE
+	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture2
+  .ENDIF
   
   RET
 DrawWallColumn ENDP
@@ -564,6 +584,7 @@ DrawWall PROC, hdc:HDC, drawdc:HDC
   LOCAL FOVAngle:REAL8, HalfFOVAngle:REAL8, deltaAngle:REAL8, screenDistance:REAL8
   LOCAL tmp:DWORD, angle:REAL8, angleScreenDistance:REAL8
   LOCAL wallX:DWORD, wallY:DWORD, wallDistance:REAL8, textureOffset:REAL8
+  LOCAL textureType:DWORD
 
   ; FOVAngle = FOV * pi / 180
   FINIT
@@ -613,7 +634,7 @@ LOOP_ANGLE: ;  for ray in range(NUM_RAYS):
   push ecx
 
   ; invoke ratcasting
-  INVOKE RayCasting, angle, ADDR wallX, ADDR wallY, ADDR wallDistance, ADDR textureOffset
+  INVOKE RayCasting, angle, ADDR wallX, ADDR wallY, ADDR wallDistance, ADDR textureOffset, ADDR textureType
   mov eax, WINDOW_WIDTH
   sub eax, ecx
 
@@ -627,8 +648,8 @@ LOOP_ANGLE: ;  for ray in range(NUM_RAYS):
   FDIV
   FST angleScreenDistance
 
-  ; draw wall column
-  INVOKE DrawWallColumn, hdc, drawdc, eax, angleScreenDistance, wallDistance, textureOffset
+  ; draw wall column 
+  INVOKE DrawWallColumn, hdc, drawdc, eax, angleScreenDistance, wallDistance, textureOffset, textureType
   ; INVOKE DrawLine, hdc, playerX, playerY, wallX, wallY, 00ff0000h
 
   pop ecx

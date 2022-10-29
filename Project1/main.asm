@@ -56,6 +56,10 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_TEXTURE1
 	mov hTexture1, eax
 
+	IDB_TEXTURE2 = 104
+	INVOKE LoadBitmap, hInstance, IDB_TEXTURE2
+	mov hTexture2, eax
+
 	INVOKE LoadCursor, NULL, IDC_ARROW
 	mov MainWin.hCursor, eax
 
