@@ -38,7 +38,7 @@ SPRITE_HEIGHT_SHIFT REAL8 0.27f
 GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 	LOCAL deltaX:SDWORD, deltaY:SDWORD, theta:REAL8, delta:REAL8, temp:DWORD
 	LOCAL deltaRays:SDWORD, screenX:SDWORD
-	LOCAL dist:REAL8, normDist:REAL8
+	LOCAL dist:REAL8, normDist:REAL8, normDistInt:DWORD
 	LOCAL FOVAngle:REAL8, deltaAngle:REAL8
 	LOCAL HalfFOVAngle:REAL8, screenDistance:REAL8
 	LOCAL proj:REAL8, projWidth:DWORD, projHeight:DWORD
@@ -209,8 +209,11 @@ finishAddDelta:
 	FSUB ; TODO:HEIGHT_SHIFT
 	FIST posY
 
+	FINIT
+	FLD normDist
+	FIST normDistInt
 	
-	INVOKE DrawNPC, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1
+	INVOKE DrawNPC, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
 exit_get_sprite:
 	RET
 GetSprite ENDP

@@ -19,9 +19,11 @@ includelib gdi32.lib
 include config.inc
 include draw.inc
 
+FUNCPROTO       TYPEDEF PROTO 
+FUNCPTR         TYPEDEF PTR FUNCPROTO
+
 ;==================== DATA =======================
 .data
-
 
 ErrorTitle  BYTE "Error",0
 WindowName  BYTE "ASM Windows App",0
@@ -37,7 +39,6 @@ winRect   RECT <>
 hMainWnd  DWORD ?
 hInstance DWORD ?
 WINDOW_STYLE = WS_POPUP
-
 
 ;=================== CODE =========================
 .code

@@ -26,6 +26,8 @@ include sprite.inc
 renderList renderObject RENDER_LIST_LENGTH DUP(<>)
 renderHead DWORD ?
 renderTail DWORD ?
+l DWORD ?
+r DWORD ?
 
 
 .code
@@ -46,7 +48,7 @@ DrawLine Proc, hdc:HDC, fromX:DWORD, fromY:DWORD, toX:DWORD, toY:DWORD, RGB: DWO
 DrawLine ENDP
 
 PushRenderList Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nHeight:DWORD,
-	SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, pic:DWORD, transparent:DWORD
+	SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, pic:DWORD, transparent:DWORD, dist:DWORD
   mov edi, renderTail 
 
   mov eax, DestX
@@ -69,6 +71,8 @@ PushRenderList Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD
   mov (renderObject PTR renderList[edi]).hPic, eax
   mov eax, transparent
   mov (renderObject PTR renderList[edi]).transparent, eax
+  mov eax, dist
+  mov (renderObject PTR renderList[edi]).dist, eax
 
   add edi, TYPE renderObject
   mov renderTail, edi
@@ -76,20 +80,153 @@ PushRenderList Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD
 PushRenderList ENDP
 
 DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nHeight:DWORD,
-				 SrcX:DWORD, SrcY:DWORD, pic:DWORD
-	invoke PushRenderList, hdc, drawdc, DestX, DestY, nWidth, nHeight, SrcX, SrcY, nWidth, 256, pic, 0
+				 SrcX:DWORD, SrcY:DWORD, pic:DWORD, dist:DWORD
+	invoke PushRenderList, hdc, drawdc, DestX, DestY, nWidth, nHeight, SrcX, SrcY, nWidth, 256, pic, 0, dist
   RET
 DrawBitmap ENDP
 
-DrawNPC Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD
+DrawNPC Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD, dist:DWORD
 	LOCAL oldObject:HGDIOBJ, color:DWORD
-  INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, hNPC1, 1
+  INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, hNPC1, 1, dist
   RET
 DrawNPC ENDP
+swap proc 
+
+ 
+ pushad
+ mov eax, esi
+ mov edi, size renderObject
+ mul edi
+ add eax, offset renderList
+ mov esi, eax
+
+ mov eax, ebx
+ mov edi, size renderObject
+ mul edi
+ add eax, offset renderList
+ mov ebx, eax
+
+ xor edx, edx
+ mov eax, size renderObject
+ mov edi, size dword
+ div edi
+ mov ecx, eax
+swap_loop:
+ mov edx, DWORD PTR [esi]
+ mov edi, DWORD PTR [ebx]
+ mov [esi], edi
+ mov [ebx], edx
+ add esi, 4
+ add ebx, 4
+ loop swap_loop
+
+ popad
+ ret
+swap endp
+ 
+quicksort proc
+ mov eax, l
+ cmp eax, r
+ jg over
+ xor esi, esi;
+ xor ebx, ebx;
+ mov esi, l ;i
+ mov ebx, r ;j
+ ;mov eax, dat[esi * type dat]
+
+
+ ;xor edx, edx
+ ;mov eax, esi
+ ;mov esi, SIZE renderObject
+; mul esi
+ ;mov esi, eax
+ xor edx, edx
+ mov eax, esi
+ mov edi, SIZE renderObject
+ mul edi
+ mov edi, eax
+ mov eax, (renderObject PTR renderList[edi]).dist
+
+
+ ;xor edx, edx
+;mov eax, esi
+;mov esi, SIZE renderObject
+;div esi
+;mov esi, eax
+
+
+
+sort_again:
+ cmp ebx,esi;    while (i!=j)
+ je over_loop;
+  loop_j_again:
+   cmp esi, ebx;    while(i<j)
+   jge over_loop
+   ;cmp eax,dat[ebx * type dat];  while (a[j]>=a[l])
+
+    mov ecx, eax
+     xor edx, edx
+     mov eax, ebx
+     mov edi, SIZE renderObject
+     mul edi
+     mov edi, eax
+     mov eax, ecx
+   cmp eax, (renderObject PTR renderList[edi]).dist
+   jl loop_i_again
+   add ebx, -1   ;  j--
+   jmp loop_j_again; 
+  loop_i_again:
+   cmp esi, ebx;    while (i<j)
+   jge over_loop
+   ;cmp eax,dat[esi * type dat];  while (a[l]>=a[i])
+
+ mov ecx, eax
+ xor edx, edx
+ mov eax, esi
+ mov edi, SIZE renderObject
+ mul edi
+ mov edi, eax
+ mov eax, ecx
+   cmp eax, (renderObject PTR renderList[edi]).dist
+
+
+   jg compare;
+   add esi, 1;     i++
+   jmp loop_i_again;
+  compare:
+   cmp esi, ebx;   if (i>=j)
+   jge over_loop;    break
+   call swap;    swap(i,j)
+ jmp sort_again
+ over_loop:
+  mov ebx, l;
+  call swap;    swap(i,l)
+  push esi; push i
+  push r  ;push r
+  mov r, esi
+  add r, -1
+  call quicksort;   quicksort(l, i-1);
+  pop r
+  pop ebx
+  mov l, ebx;
+  inc l
+  call quicksort;   quicksort(i+1, r);
+ over:
+  ret
+quicksort endp
 
 Render Proc, hdc:HDC, drawdc:HDC
 	LOCAL oldObject:HGDIOBJ
-	
+
+	xor edx, edx
+	mov eax, renderTail
+	mov ebx, SIZE renderObject
+	div ebx
+	dec eax
+	mov l, 0
+	mov r, eax
+	call quicksort
+
 	mov esi, 0
 	INVOKE SelectObject, drawdc, (renderObject PTR renderList[esi]).hPic
 	mov oldObject, eax

@@ -505,7 +505,7 @@ RayCasting ENDP
 
 DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8, textureOffset:REAL8, textureType:DWORD
   LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD, color:DWORD,
-		param1:DWORD, param2:DWORD, tempcolor:BYTE, tempoffset:DWORD
+		param1:DWORD, param2:DWORD, tempcolor:BYTE, tempoffset:DWORD, wallDistanceInt:DWORD
   ; screenHeight = wallHeight * (screenDistance / wallDistance)
   ; use XScale = wallHeight
 
@@ -570,14 +570,19 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
   FILD XScale
   FMUL
   FIST tempoffset
+
+  FINIT
+  FLD wallDistance
+  FIST wallDistanceInt
+
   mov ebx, textureType
   .IF ebx == 1
-	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture1
+	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture1, wallDistanceInt
   .ELSE 
 	.IF ebx == 2
-		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture2
+		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture2, wallDistanceInt
 	.ELSE
-		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture3
+		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture3, wallDistanceInt
 	.ENDIF
   .ENDIF
   
