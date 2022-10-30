@@ -164,6 +164,8 @@ COMMENT @
 @
 	.IF eax == WM_TIMER
 	  ; Get HDC
+
+
 	  INVOKE GetDC, hMainWnd
 	  mov hdc, eax
 

@@ -8,14 +8,12 @@ include user32.inc
 include kernel32.inc
 include gdi32.inc
 include msvcrt.inc
-include msimg32.inc
 
 ; MASM32 Library
 includelib user32.lib
 includelib kernel32.lib
 includelib gdi32.lib
 includelib msvcrt.lib
-includelib msimg32.lib
 
 ; Custom Header
 include player.inc
@@ -36,17 +34,6 @@ SPRITE_HEIGHT_SHIFT REAL8 0.27f
 
 
 .code
-
-DrawNPC Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD
-	LOCAL oldObject:HGDIOBJ, color:DWORD
-  INVOKE SelectObject, drawdc, pic
-  mov oldObject, eax
-  INVOKE GetRGB, 255, 255, 255
-  mov color, eax
-  INVOKE TransparentBlt, hdc, DestX, DestY, projWidth, projHeight, drawdc, 0, 0, 126, 132, color
-  INVOKE SelectObject, drawdc, oldObject
-  RET
-DrawNPC ENDP
 
 GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 	LOCAL deltaX:SDWORD, deltaY:SDWORD, theta:REAL8, delta:REAL8, temp:DWORD
