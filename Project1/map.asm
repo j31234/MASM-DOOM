@@ -505,7 +505,7 @@ RayCasting ENDP
 
 DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, wallDistance:REAL8, textureOffset:REAL8, textureType:DWORD
   LOCAL screenHeight:DWORD, columnBegin:DWORD, columnEnd:DWORD, color:DWORD,
-		param1:DWORD, param2:DWORD, tempcolor:BYTE, tempoffset:DWORD, wallDistanceInt:DWORD
+		param1:DWORD, param2:DWORD, tempcolor:BYTE, tempoffset:DWORD, wallDistanceInt:DWORD, temp :DWORD
   ; screenHeight = wallHeight * (screenDistance / wallDistance)
   ; use XScale = wallHeight
 
@@ -573,6 +573,8 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
 
   FINIT
   FLD wallDistance
+  mov temp, 1000 ;avoid float number comparison
+  FIMUL temp
   FIST wallDistanceInt
 
   mov ebx, textureType

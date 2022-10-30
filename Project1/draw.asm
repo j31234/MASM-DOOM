@@ -85,11 +85,11 @@ DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nH
   RET
 DrawBitmap ENDP
 
-DrawNPC Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD, dist:DWORD
+DrawNPCBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD, dist:DWORD
 	LOCAL oldObject:HGDIOBJ, color:DWORD
   INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, hNPC1, 1, dist
   RET
-DrawNPC ENDP
+DrawNPCBitmap ENDP
 swap proc 
 
  
@@ -297,6 +297,18 @@ DrawFloor Proc, hdc:HDC
   RET
 DrawFloor ENDP
 
+DrawNPC Proc, hdc:HDC, drawdc:HDC
+	mov ecx, NPCNum
+NPC_LOOP:
+	mov eax, ecx
+	dec eax
+	mov ebx, SIZE NPC
+	mul ebx
+	INVOKE GetSprite, hdc, drawdc, (NPC PTR NPCList[eax]).posX, (NPC PTR NPCList[eax]).posY
+	loop NPC_LOOP
+	RET
+DrawNPC ENDP
+
 DrawMain Proc, hdc:HDC, drawdc:HDC
   pushad
 
@@ -308,7 +320,7 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   INVOKE DrawBackground, hdc, drawdc, 0, 0
   INVOKE DrawFloor, hdc
   INVOKE DrawWall, hdc, drawdc
-  INVOKE GetSprite, hdc, drawdc, 500, 500; TODO: temperarily set a position
+  INVOKE DrawNPC, hdc, drawdc
   
   INVOKE Render, hdc, drawdc
   

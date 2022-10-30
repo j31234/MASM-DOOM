@@ -20,10 +20,15 @@ include player.inc
 include draw.inc
 include config.inc
 include map.inc
+include sprite.inc
 
 .data
-NPCX DWORD 80
-NPCY DWORD 100
+
+
+NPCList NPC 1 DUP(<500,500>) ;TODO: init NPC position
+NPCNum DWORD 1
+
+
 IMAGE_WIDTH DWORD 126
 IMAGE_HALF_WIDTH DWORD 63
 IMAGE_HEIGHT DWORD 132
@@ -31,6 +36,8 @@ IMAGE_RATIO REAL8 0.9545f
 
 SPRITE_SCALE REAL8 80.0f
 SPRITE_HEIGHT_SHIFT REAL8 0.27f
+
+
 
 
 .code
@@ -210,10 +217,12 @@ finishAddDelta:
 	FIST posY
 
 	FINIT
-	FLD normDist
+	FLD dist  
+	mov temp, 1000 ;avoid float number comparison
+	FIMUL temp
 	FIST normDistInt
 	
-	INVOKE DrawNPC, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
+	INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
 exit_get_sprite:
 	RET
 GetSprite ENDP

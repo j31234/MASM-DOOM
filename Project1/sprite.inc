@@ -3,6 +3,13 @@ SPRITE_INC equ <1>
 
 include windows.inc
 
+NPC STRUCT
+	posX DWORD ?
+	posY DWORD ?
+NPC ENDS
+
+EXTERNDEF NPCList: NPC
+EXTERNDEF NPCNum: DWORD
 
 GetSprite Proto, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 ENDIF
