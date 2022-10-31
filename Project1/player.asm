@@ -22,9 +22,9 @@ include config.inc
 include map.inc
 
 .data
-playerX DWORD 100
-playerY DWORD 100
-playerAngle REAL8 0.78
+playerX DWORD 190
+playerY DWORD 270
+playerAngle REAL8 3.6
 speedX DWORD 0
 speedY DWORD 0
 .code

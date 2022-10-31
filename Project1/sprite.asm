@@ -67,37 +67,41 @@ GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 	FINIT
 	FLD playerAngle
 	FST tempPlayerAngle
-	; TODO: set player angle to [-pi, pi]
-angleGreaterPi:
+	; set player angle to [0, 2pi]
+angleGreater2Pi:
 	 FINIT
 	 FLD tempPlayerAngle
 	 FLDPI
+	 mov temp, 2
+	 FIMUL temp
 	 FCOM
 	 FSTSW ax
 	 SAHF
-	 jnc angleLessPi
-	 mov temp, 2
-	 FIMUL temp
+	 jnc angleLess2Pi
 	 FSUB
 	 FST tempPlayerAngle
-	 jmp angleGreaterPi
-angleLessPi:
+	 jmp angleGreater2Pi
+angleLess2Pi:
 	 NOP
-angleLessMinusPi:
+angleLess0:
 	 FINIT
 	 FLD tempPlayerAngle
-	 FLDPI
+	 mov temp, 0
+	 FILD temp
 	 FCHS
 	 FCOM
 	 FSTSW ax
 	 SAHF
-	 jc angleGreaterMinusPi
+	 jc angleGreater0
+	 FINIT
+	 FLD tempPlayerAngle
+	 FLDPI
 	 mov temp, 2
 	 FIMUL temp
-	 FSUB
+	 FADD
 	 FST tempPlayerAngle
-	 jmp angleLessMinusPi
-angleGreaterMinusPi:
+	 jmp angleLess0
+angleGreater0:
 
 	FINIT
 	FLD theta
@@ -106,20 +110,20 @@ angleGreaterMinusPi:
 	FST delta
 
 	FINIT
-	FLD theta
+	FLD tempPlayerAngle
 	FLDPI
 	FCOM
 	FSTSW ax
 	SAHF
-	jc thetaGreaterPi
-	jmp thetaLessPi
-thetaGreaterPi:
+	jc playerAngleGreaterPi
+	jmp playerAngleLessPi
+playerAngleGreaterPi:
 	; if deltaX > 0
 	mov eax, deltaX
 	cmp eax, 0
 	jg addDelta
 
-thetaLessPi:
+playerAngleLessPi:
 	; if deltaX < 0 && deltaY < 0
 	mov eax, deltaX
 	cmp eax, 0
@@ -134,7 +138,7 @@ addDelta:
 	FLD delta
 	FLDPI
 	mov temp, 2
-	FMUL temp
+	FIMUL temp
 	FADD
 	FST delta
 finishAddDelta:
