@@ -25,7 +25,7 @@ include sprite.inc
 .data
 
 
-NPCList NPC 1 DUP(<500,500>) ;TODO: init NPC position
+NPCList NPC 1 DUP(<200,200>) ;TODO: init NPC position
 NPCNum DWORD 1
 
 
@@ -49,7 +49,7 @@ GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 	LOCAL FOVAngle:REAL8, deltaAngle:REAL8
 	LOCAL HalfFOVAngle:REAL8, screenDistance:REAL8
 	LOCAL proj:REAL8, projWidth:DWORD, projHeight:DWORD
-	LOCAL posX: DWORD, posY: DWORD
+	LOCAL posX: DWORD, posY: DWORD, tempPlayerAngle:REAL8
 	mov eax, x
 	sub eax, playerX
 	mov deltaX, eax
@@ -65,8 +65,43 @@ GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 	FST theta
 
 	FINIT
-	FLD theta
 	FLD playerAngle
+	FST tempPlayerAngle
+	; TODO: set player angle to [-pi, pi]
+angleGreaterPi:
+	 FINIT
+	 FLD tempPlayerAngle
+	 FLDPI
+	 FCOM
+	 FSTSW ax
+	 SAHF
+	 jnc angleLessPi
+	 mov temp, 2
+	 FIMUL temp
+	 FSUB
+	 FST tempPlayerAngle
+	 jmp angleGreaterPi
+angleLessPi:
+	 NOP
+angleLessMinusPi:
+	 FINIT
+	 FLD tempPlayerAngle
+	 FLDPI
+	 FCHS
+	 FCOM
+	 FSTSW ax
+	 SAHF
+	 jc angleGreaterMinusPi
+	 mov temp, 2
+	 FIMUL temp
+	 FSUB
+	 FST tempPlayerAngle
+	 jmp angleLessMinusPi
+angleGreaterMinusPi:
+
+	FINIT
+	FLD theta
+	FLD tempPlayerAngle
 	FSUB
 	FST delta
 

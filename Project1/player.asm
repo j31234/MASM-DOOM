@@ -22,12 +22,11 @@ include config.inc
 include map.inc
 
 .data
-playerX DWORD 150
-playerY DWORD 150
-playerAngle REAL8 -0.0
+playerX DWORD 100
+playerY DWORD 100
+playerAngle REAL8 0.78
 speedX DWORD 0
 speedY DWORD 0
-
 .code
 UpdatePlayerAngle PROC
   LOCAL cursorPos:POINT, dAngle: DWORD

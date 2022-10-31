@@ -304,7 +304,9 @@ NPC_LOOP:
 	dec eax
 	mov ebx, SIZE NPC
 	mul ebx
+	pushad
 	INVOKE GetSprite, hdc, drawdc, (NPC PTR NPCList[eax]).posX, (NPC PTR NPCList[eax]).posY
+	popad
 	loop NPC_LOOP
 	RET
 DrawNPC ENDP
@@ -319,8 +321,8 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
   INVOKE DrawBackground, hdc, drawdc, 0, 0
   INVOKE DrawFloor, hdc
-  INVOKE DrawWall, hdc, drawdc
   INVOKE DrawNPC, hdc, drawdc
+  INVOKE DrawWall, hdc, drawdc
   
   INVOKE Render, hdc, drawdc
   
