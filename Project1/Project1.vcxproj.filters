@@ -46,25 +46,25 @@
     <Image Include="res\caco.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\shotgun_0.png">
-      <Filter>资源文件</Filter>
-    </Image>
     <Image Include="res\bitmap1.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\shotgun_1.png">
+    <Image Include="res\shotgun_0.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\shotgun_2.png">
+    <Image Include="res\shotgun_1.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\shotgun_3.png">
+    <Image Include="res\shotgun_2.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\shotgun_4.png">
+    <Image Include="res\shotgun_3.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\shotgun_5.png">
+    <Image Include="res\shotgun_4.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\shotgun_5.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

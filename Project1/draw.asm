@@ -21,6 +21,7 @@ include player.inc
 include map.inc
 include config.inc
 include sprite.inc
+include weapon.inc
 
 .data
 renderList renderObject RENDER_LIST_LENGTH DUP(<>)
@@ -90,9 +91,14 @@ DrawNPCBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWO
   INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, hNPC1, 1, dist
   RET
 DrawNPCBitmap ENDP
-swap proc 
 
- 
+DrawTransparentBitmap  Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, DestWidth:DWORD, DestHeight:DWORD,
+	SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, hBitmap:DWORD, distance:DWORD
+  INVOKE PushRenderList, hdc,drawdc, DestX, DestY, DestWidth, DestHeight, SrcX, SrcY, SrcWidth, SrcHeight, hBitmap, 1, distance
+  RET
+DrawTransparentBitmap ENDP
+
+swap proc 
  pushad
  mov eax, esi
  mov edi, size renderObject
@@ -239,6 +245,7 @@ Render Proc, hdc:HDC, drawdc:HDC
 				(renderObject PTR renderList[esi]).srcX, (renderObject PTR renderList[esi]).srcY,
 				(renderObject PTR renderList[esi]).srcWidth, (renderObject PTR renderList[esi]).srcHeight, SRCCOPY
 		.ELSE
+			; blt white background
 			INVOKE GetRGB, 255, 255, 255
 			INVOKE TransparentBlt, hdc, (renderObject PTR renderList[esi]).destX, (renderObject PTR renderList[esi]).destY,
 				(renderObject PTR renderList[esi]).destWidth, (renderObject PTR renderList[esi]).destHeight, drawdc,
@@ -324,6 +331,11 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   INVOKE DrawNPC, hdc, drawdc
   INVOKE DrawWall, hdc, drawdc
   
+  ; Draw Weapon
+  INVOKE DrawWeapon, hdc, drawdc
+  
+  
+
   INVOKE Render, hdc, drawdc
   
   ; Reset cursor position to the middle of the window

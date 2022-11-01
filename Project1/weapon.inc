@@ -1,0 +1,20 @@
+IFNDEF WEAPON_INC
+WEAPON_INC equ <1>
+
+; function
+DrawWeapon Proto, hdc:HDC, drawdc:HDC
+
+; data
+EXTERNDEF weaponState: DWORD
+
+; config
+WEAPON_WIDTH = 350
+WEAPON_HEIGHT = 350
+WEAPON_IDLE = 0 ; weapon state
+WEAPON_FIRE_0 = 1
+WEAPON_FIRE_1 = 2
+WEAPON_RELOAD_0 = 3
+WEAPON_RELOAD_1 = 4
+WEAPON_RELOAD_2 = 5
+
+ENDIF

@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import glob
 
-blt_color = (0, 255, 0) # blt color: green
+blt_color = (255, 255, 255) # blt color: green
 png_list = glob.glob('input/*.png')
 for png in png_list:
     img = Image.open(png)
