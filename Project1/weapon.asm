@@ -21,10 +21,14 @@ include draw.inc
 include config.inc
 
 .data
-weaponState DWORD 4
+weaponState DWORD WEAPON_IDLE
 frameCount DWORD 0
 
 .code
+OnWeaponFired Proc
+  ; TODO: Bullet Collision Detection
+OnWeaponFired ENDP
+
 DrawWeapon Proc, hdc:HDC, drawdc:HDC
   mov eax, weaponState
   mov eax, hWeaponBitmapList[eax * TYPE hWeaponBitmapList]
@@ -42,20 +46,32 @@ DrawWeapon Proc, hdc:HDC, drawdc:HDC
   .ENDIF
   
   ; update weapon state
-  ; frameCount += 1
   mov eax, frameCount
   inc eax
   mov frameCount, eax
 
+  ; when weapon fired
+  INVOKE GetAsyncKeyState, VK_LBUTTON
+  shr ax, 15
+  .IF ax != 0 && weaponState == WEAPON_IDLE 
+    mov weaponState, WEAPON_FIRE_0
+	mov frameCount, 0
+  .ENDIF
+
   .IF frameCount == WEAPON_FRAME_PER_TRANS
-    mov frameCount, 0
-	
+	; weaponState = (weaponState + 1) % 6
 	mov eax, weaponState
-	inc eax
-	.IF eax == 6
-	  mov eax, 0
+	.IF eax == WEAPON_RELOAD_2
+	  mov eax, WEAPON_IDLE
+	.ELSEIF eax != WEAPON_IDLE
+	  inc eax
 	.ENDIF
 	mov weaponState, eax
+
+	mov frameCount, 0
+	.IF weaponState >= WEAPON_RELOAD_0
+	  mov frameCount, -WEAPON_FRAME_PER_TRANS
+	.ENDIF 
   .ENDIF
   RET
 DrawWeapon ENDP

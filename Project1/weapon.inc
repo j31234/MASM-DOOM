@@ -10,7 +10,7 @@ EXTERNDEF weaponState: DWORD
 ; config
 WEAPON_WIDTH = 350
 WEAPON_HEIGHT = 350
-WEAPON_FRAME_PER_TRANS = 5 ; Transition happens each WEAPON_FRAME_PER_TRANS frames
+WEAPON_FRAME_PER_TRANS = 3 ; Transition happens each WEAPON_FRAME_PER_TRANS frames
 ; weapon state
 WEAPON_IDLE = 0 
 WEAPON_FIRE_0 = 1
