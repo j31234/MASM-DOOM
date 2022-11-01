@@ -27,6 +27,7 @@ frameCount DWORD 0
 .code
 OnWeaponFired Proc
   ; TODO: Bullet Collision Detection
+  RET
 OnWeaponFired ENDP
 
 DrawWeapon Proc, hdc:HDC, drawdc:HDC
@@ -56,6 +57,7 @@ DrawWeapon Proc, hdc:HDC, drawdc:HDC
   .IF ax != 0 && weaponState == WEAPON_IDLE 
     mov weaponState, WEAPON_FIRE_0
 	mov frameCount, 0
+	INVOKE OnWeaponFired
   .ENDIF
 
   .IF frameCount == WEAPON_FRAME_PER_TRANS
