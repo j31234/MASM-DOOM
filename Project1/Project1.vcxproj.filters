@@ -46,6 +46,27 @@
     <Image Include="res\caco.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\shotgun_0.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\bitmap1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\shotgun_1.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\shotgun_2.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\shotgun_3.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\shotgun_4.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\shotgun_5.png">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="main.asm">
@@ -66,6 +87,9 @@
     <MASM Include="sprite.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="weapon.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="draw.inc">
@@ -78,6 +102,9 @@
       <Filter>头文件</Filter>
     </None>
     <None Include="sprite.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="weapon.inc">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>

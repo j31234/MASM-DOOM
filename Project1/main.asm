@@ -73,6 +73,15 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_NPC1
 	mov hNPC1, eax
 
+	; Load 6 bitmap for weapon animation
+	mov ebx, 0
+	.WHILE ebx < 6
+		mov eax, weapnIDBList[ebx * TYPE weapnIDBList]
+		INVOKE LoadBitmap, hInstance, eax
+		mov hWeaponBitmapList[ebx * TYPE weapnIDBList], eax
+		inc ebx
+	.ENDW
+
 	INVOKE LoadCursor, NULL, IDC_ARROW
 	mov MainWin.hCursor, eax
 

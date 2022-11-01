@@ -75,6 +75,7 @@
     <MASM Include="map.asm" />
     <MASM Include="player.asm" />
     <MASM Include="sprite.asm" />
+    <MASM Include="weapon.asm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player.inc" />
@@ -85,7 +86,14 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />
+    <Image Include="res\bitmap1.bmp" />
     <Image Include="res\caco.bmp" />
+    <Image Include="res\shotgun_0.png" />
+    <Image Include="res\shotgun_1.png" />
+    <Image Include="res\shotgun_2.png" />
+    <Image Include="res\shotgun_3.png" />
+    <Image Include="res\shotgun_4.png" />
+    <Image Include="res\shotgun_5.png" />
     <Image Include="res\sky.bmp" />
     <Image Include="res\texture1.bmp" />
     <Image Include="res\texture2.bmp" />
@@ -96,6 +104,7 @@
     <None Include="draw.inc" />
     <None Include="map.inc" />
     <None Include="sprite.inc" />
+    <None Include="weapon.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

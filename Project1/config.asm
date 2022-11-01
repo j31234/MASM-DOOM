@@ -12,5 +12,7 @@ hTexture2 DWORD ?
 hTexture3 DWORD ?
 hBackground DWORD ?
 hNPC1 DWORD ?
+weapnIDBList DWORD 125, 126, 127, 128, 129, 130
+hWeaponBitmapList DWORD 6 DUP(?)
 
 END
