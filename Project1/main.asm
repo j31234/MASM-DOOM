@@ -76,9 +76,9 @@ WinMain PROC
 	; Load 6 bitmap for weapon animation
 	mov ebx, 0
 	.WHILE ebx < 6
-		mov eax, weapnIDBList[ebx * TYPE weapnIDBList]
+		mov eax, weaponIDBList[ebx * TYPE weaponIDBList]
 		INVOKE LoadBitmap, hInstance, eax
-		mov hWeaponBitmapList[ebx * TYPE weapnIDBList], eax
+		mov hWeaponBitmapList[ebx * TYPE hWeaponBitmapList], eax
 		inc ebx
 	.ENDW
 
