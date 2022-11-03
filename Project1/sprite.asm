@@ -67,6 +67,7 @@ GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 	FINIT
 	FLD playerAngle
 	FST tempPlayerAngle
+
 	; set player angle to [0, 2pi]
 angleGreater2Pi:
 	 FINIT
