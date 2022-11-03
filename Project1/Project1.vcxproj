@@ -74,6 +74,7 @@
     <MASM Include="main.asm" />
     <MASM Include="map.asm" />
     <MASM Include="player.asm" />
+    <MASM Include="sound.asm" />
     <MASM Include="sprite.asm" />
     <MASM Include="weapon.asm" />
   </ItemGroup>
@@ -103,6 +104,7 @@
     <None Include="config.inc" />
     <None Include="draw.inc" />
     <None Include="map.inc" />
+    <None Include="sound.inc" />
     <None Include="sprite.inc" />
     <None Include="weapon.inc" />
   </ItemGroup>

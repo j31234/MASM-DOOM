@@ -19,6 +19,7 @@ includelib msimg32.lib
 include weapon.inc
 include draw.inc
 include config.inc
+include sound.inc
 
 .data
 weaponState DWORD WEAPON_IDLE
@@ -27,6 +28,7 @@ frameCount DWORD 0
 .code
 OnWeaponFired Proc
   ; TODO: Bullet Collision Detection
+  INVOKE ShotgunSound
   RET
 OnWeaponFired ENDP
 
