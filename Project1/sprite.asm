@@ -25,9 +25,9 @@ include queue.inc
 
 .data
 
-NPCList NPC 1 DUP(<134,210>) ;TODO: init NPC position
-NPCNum DWORD 1
-NPCAliveNum DWORD 1
+NPCList NPC  <134,210,>, <250,250,> ;TODO: init NPC position
+NPCNum DWORD 2
+NPCAliveNum DWORD 2
 
 
 IMAGE_WIDTH DWORD 126
@@ -247,17 +247,24 @@ UPDATE_NPC_POSITION:
   RET
 MoveNPC ENDP
 
-GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD, npcID:DWORD
+GetSprite PROC posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:PTR DWORD, normDist:PTR REAL8, normDistInt:PTR DWORD, delta_res:PTR REAL8, npcID:DWORD
 	LOCAL deltaX:SDWORD, deltaY:SDWORD, theta:REAL8, delta:REAL8, temp:DWORD
 	LOCAL deltaRays:SDWORD, screenX:SDWORD
-	LOCAL dist:REAL8, normDist:REAL8, normDistInt:DWORD
+	LOCAL dist:REAL8
 	LOCAL FOVAngle:REAL8, deltaAngle:REAL8
 	LOCAL HalfFOVAngle:REAL8, screenDistance:REAL8
-	LOCAL proj:REAL8, projWidth:DWORD, projHeight:DWORD
-	LOCAL posX: DWORD, posY: DWORD, tempPlayerAngle:REAL8
-	; Move NPC
-	INVOKE MoveNPC, npcID
+	LOCAL proj:REAL8
+	LOCAL tempPlayerAngle:REAL8
+	LOCAL x:DWORD, y:DWORD
 
+	
+	mov eax, npcID
+	mov eax, (NPC PTR NPCList[eax]).posX
+	mov x, eax
+	
+	mov eax, npcID
+	mov eax, (NPC PTR NPCList[eax]).posY
+	mov y, eax
 
 	mov eax, x
 	sub eax, playerX
@@ -398,7 +405,8 @@ finishAddDelta:
 	FLD delta
 	FCOS
 	FMUL
-	FST normDist
+	mov esi, normDist
+	FST REAL8 PTR [esi]
 
 	mov eax,IMAGE_HALF_WIDTH
 	neg eax
@@ -433,46 +441,59 @@ finishAddDelta:
 	; proj = SCREEN_DIST / self.norm_dist * self.SPRITE_SCALE
 	FINIT
 	FLD screenDistance
-	FLD normDist
+	mov esi, normDist
+	FLD REAL8 PTR [esi]
 	FDIV
 	FLD SPRITE_SCALE
 	FMUL
-	FIST projHeight
+	mov esi, projHeight
+	FIST DWORD PTR [esi]
 
 	; projWidth = proj * self.IMAGE_RATIO
 	FINIT
-	FILD projHeight
+	mov esi, projHeight
+	FILD DWORD PTR [esi]
 	FLD IMAGE_RATIO
 	FMUL
-	FIST projWidth
+	mov esi, projWidth
+	FIST DWORD PTR [esi]
 
 	; posX = self.screen_x - self.sprite_half_width
 	FINIT
 	FILD screenX
-	FILD projWidth
+	mov esi, projWidth
+	FILD DWORD PTR [esi]
 	mov temp, 2
 	FIDIV temp
 	FSUB
-	FIST posX
+	mov esi, posX
+	FIST DWORD PTR [esi]
 
 	; posY = HALF_HEIGHT - proj_height // 2 + height_shift
 	FINIT
 	mov temp, WINDOW_HALF_HEIGHT
 	FILD temp
-	FILD projHeight
+	mov esi, projHeight
+	FILD DWORD PTR [esi]
 	mov temp, 2
 	FIDIV temp
 	FSUB ; TODO:HEIGHT_SHIFT
-	FIST posY
+	mov esi, posY
+	FIST DWORD PTR [esi]
 
 	FINIT
 	FLD dist  
 	mov temp, 1000 ;avoid float number comparison
 	FIMUL temp
-	FIST normDistInt
+	mov esi, normDistInt
+	FIST DWORD PTR [esi]
 	
-	INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
+	
 exit_get_sprite:
+	FINIT
+	FLD delta
+	mov esi, delta_res
+	FST REAL8 PTR [esi]
 	RET
 GetSprite ENDP
 END

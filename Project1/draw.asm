@@ -290,15 +290,27 @@ DrawFloor Proc, hdc:HDC
 DrawFloor ENDP
 
 DrawNPC Proc, hdc:HDC, drawdc:HDC
+	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDistInt:DWORD, delta:REAL8, normDist:REAL8
 	mov ecx, NPCNum
 NPC_LOOP:
 	mov eax, ecx
 	dec eax
 	mov ebx, SIZE NPC
 	mul ebx
-	pushad
-	INVOKE GetSprite, hdc, drawdc, (NPC PTR NPCList[eax]).posX, (NPC PTR NPCList[eax]).posY, eax
-	popad
+	mov edx, (NPC PTR NPCList[eax]).blood
+	.IF edx > 0
+		; Move NPC
+		pushad
+		INVOKE MoveNPC, eax
+		popad
+		; Get NPC position
+		pushad
+		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, eax
+		; Draw NPC
+		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
+		
+		popad
+	.ENDIF
 	loop NPC_LOOP
 	RET
 DrawNPC ENDP
