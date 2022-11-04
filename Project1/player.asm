@@ -17,7 +17,6 @@ includelib msvcrt.lib
 
 ; Custom Header
 include player.inc
-include draw.inc
 include config.inc
 include map.inc
 
@@ -25,6 +24,7 @@ include map.inc
 playerX DWORD 190
 playerY DWORD 270
 playerAngle REAL8 3.6
+playerBlood DWORD 100
 speedX DWORD 0
 speedY DWORD 0
 .code
@@ -156,5 +156,11 @@ DrawPlayer PROC, hdc: HDC
 
   RET
 DrawPlayer ENDP
+
+; 
+playerStateCheck PROC
+	mov eax, 3
+	RET
+playerStateCheck ENDP
 
 END

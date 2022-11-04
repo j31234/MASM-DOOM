@@ -81,14 +81,15 @@ PushRenderList Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD
 PushRenderList ENDP
 
 DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nHeight:DWORD,
-				 SrcX:DWORD, SrcY:DWORD, pic:DWORD, dist:DWORD
-	invoke PushRenderList, hdc, drawdc, DestX, DestY, nWidth, nHeight, SrcX, SrcY, nWidth, 256, pic, 0, dist
+				 SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, hpic:DWORD, dist:DWORD
+	invoke PushRenderList, hdc, drawdc, DestX, DestY, nWidth, nHeight, SrcX, SrcY, SrcWidth, SrcHeight, hpic, 0, dist
   RET
 DrawBitmap ENDP
 
 DrawNPCBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD, dist:DWORD
 	LOCAL oldObject:HGDIOBJ, color:DWORD
   INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, hNPC1, 1, dist
+
   RET
 DrawNPCBitmap ENDP
 
@@ -318,11 +319,31 @@ NPC_LOOP:
 	RET
 DrawNPC ENDP
 
+DrawEnd PROC,  hdc:HDC, drawdc:HDC
+	INVOKE DrawBitmap, hdc, drawdc, 0, 0, 800, 600, 50, 50, 1600, 800, hEnd, 0
+	RET
+DrawEnd ENDP
+
+DrawWin PROC,  hdc:HDC, drawdc:HDC
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, 800, 600, 50, 50, 1600, 800, hWin, 0
+	RET
+DrawWin ENDP
+
+
 DrawMain Proc, hdc:HDC, drawdc:HDC
   pushad
 
   mov renderHead, 0
   mov renderTail, 0
+
+  INVOKE playerStateCheck ; 0 for dead, 1 for alive, 2 for no-attracked state, 3 for win
+
+  .IF eax == 0
+	INVOKE DrawEnd, hdc, drawdc
+	jmp StartRender
+  .ELSEIF eax == 3
+	INVOKE DrawWin, hdc, drawdc
+  .ENDIF
 
   ; INVOKE DrawMap, hdc
   INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
@@ -334,8 +355,7 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   ; Draw Weapon
   INVOKE DrawWeapon, hdc, drawdc
   
-  
-
+StartRender:
   INVOKE Render, hdc, drawdc
   
   ; Reset cursor position to the middle of the window

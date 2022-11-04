@@ -18,6 +18,7 @@ includelib gdi32.lib
 ; Custom Header
 include config.inc
 include draw.inc
+include player.inc
 
 FUNCPROTO       TYPEDEF PROTO 
 FUNCPTR         TYPEDEF PTR FUNCPROTO
@@ -81,6 +82,23 @@ WinMain PROC
 		mov hWeaponBitmapList[ebx * TYPE hWeaponBitmapList], eax
 		inc ebx
 	.ENDW
+
+	; Load 11 blood for weapon animation
+	mov ebx, 0
+	.WHILE ebx < 11
+		mov eax, bloodIDBList[ebx * TYPE bloodIDBList]
+		INVOKE LoadBitmap, hInstance, eax
+		mov hBloodBitmapList[ebx * TYPE hBloodBitmapList], eax
+		inc ebx
+	.ENDW
+
+	IDB_END = 148
+	INVOKE LoadBitmap, hInstance, IDB_END
+	mov hEnd, eax
+
+	IDB_WIN = 149
+	INVOKE LoadBitmap, hInstance, IDB_WIN
+	mov hWin, eax
 
 	INVOKE LoadCursor, NULL, IDC_ARROW
 	mov MainWin.hCursor, eax
@@ -175,7 +193,6 @@ COMMENT @
 	.IF eax == WM_TIMER
 	  ; Get HDC
 
-
 	  INVOKE GetDC, hMainWnd
 	  mov hdc, eax
 
@@ -205,6 +222,7 @@ COMMENT @
 	  ; Alt the true device context
 	  INVOKE BitBlt, hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memHdc, 0, 0, SRCCOPY
 
+ReleaseResources:
 	  ; Release Resources: double buffer, brush/pen, dc
 	  INVOKE DeleteObject, memBitmap
 	  INVOKE DeleteDC, memHdc
