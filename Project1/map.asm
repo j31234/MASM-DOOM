@@ -63,6 +63,32 @@ CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
   RET
 CheckPositionValid ENDP
 
+CheckBlockValid Proc, blockX:DWORD, blockY:DWORD
+  mov eax, blockX
+  mul COLUMN
+  add eax, blockY
+  add eax, offset mapData
+
+  mov al, [eax]
+  RET
+CheckBlockValid ENDP
+
+GetBlockID Proc, x:DWORD, y:DWORD, ptrBlockX:DWORD, ptrBlockY:DWORD
+  ; BlockX = x / XScale
+  mov eax, x
+  mov edx, 0
+  div XScale
+  mov esi, ptrBlockX
+  mov [esi], eax
+  ; BlockY = y / YScale
+  mov eax, y
+  mov edx, 0
+  div YScale
+  mov esi, ptrBlockY
+  mov [esi], eax
+  RET
+GetBlockID ENDP
+
 CheckFloatPositionValid Proc, positionX:REAL8, positionY:REAL8
   Local tempX:DWORD, tempY:DWORD, temp:WORD
   FINIT

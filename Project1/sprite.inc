@@ -11,5 +11,5 @@ NPC ENDS
 EXTERNDEF NPCList: NPC
 EXTERNDEF NPCNum: DWORD
 
-GetSprite Proto, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
+GetSprite Proto, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD, npcID:DWORD
 ENDIF
