@@ -17,6 +17,7 @@ includelib gdi32.lib
 
 ; Custom Header
 include config.inc
+include map.inc
 include draw.inc
 include player.inc
 
@@ -130,6 +131,9 @@ WinMain PROC
 	  call ErrorHandler
 	  jmp  Exit_Program
 	.ENDIF
+
+; Read map data from file
+	INVOKE InitMap
 
 ; Show and draw the window.
 	INVOKE ShowWindow, hMainWnd, SW_SHOW

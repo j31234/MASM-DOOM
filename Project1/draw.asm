@@ -313,7 +313,7 @@ NPC_LOOP:
 	mov ebx, SIZE NPC
 	mul ebx
 	pushad
-	INVOKE GetSprite, hdc, drawdc, (NPC PTR NPCList[eax]).posX, (NPC PTR NPCList[eax]).posY
+	INVOKE GetSprite, hdc, drawdc, (NPC PTR NPCList[eax]).posX, (NPC PTR NPCList[eax]).posY, eax
 	popad
 	loop NPC_LOOP
 	RET

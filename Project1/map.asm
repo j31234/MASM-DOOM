@@ -12,33 +12,63 @@ include gdi32.inc
 includelib user32.lib
 includelib kernel32.lib
 includelib gdi32.lib
+includelib msvcrt.lib
 
 ; Custom Header
 include draw.inc
 include player.inc
 include config.inc
 
+; C Prototype
+fopen  PROTO C :ptr sbyte, :ptr sbyte
+fclose PROTO C :ptr DWORD
+fscanf PROTO C :ptr DWORD, :ptr sbyte, :VARARG
+
 .data
-ROW DWORD 10
-COLUMN DWORD 10
-mapData BYTE 1,1,1,1,1,1,1,1,1,1
-        BYTE 1,0,0,0,2,0,0,0,0,1
-		BYTE 1,0,0,0,2,0,0,0,0,1
-		BYTE 1,0,0,0,2,0,1,1,1,1
-		BYTE 1,0,0,0,0,0,0,0,0,1
-		BYTE 1,2,2,2,0,3,1,1,0,1
-		BYTE 1,0,0,0,0,3,0,0,0,1
-		BYTE 1,0,0,0,0,3,0,0,0,1
-		BYTE 1,0,0,0,0,3,0,0,0,1
-		BYTE 1,1,1,1,1,1,1,1,1,1
+ROW DWORD ?
+COLUMN DWORD ?
+mapData BYTE 10000 DUP(?)
+mapFile BYTE "map.txt", 0
+mapFPTR DWORD ?
+filemode BYTE "r", 0
+inputStr BYTE "%d", 0
 
 XScale DWORD 80
 YScale DWORD 80
 eps REAL8 0.000001
 
+.code
+; Read map data from file
+InitMap Proc
+    LOCAL CurRow:DWORD, CurCol:DWORD, MapPos:DWORD
+	mov CurRow, 0
+  	INVOKE fopen, ADDR mapFile, ADDR filemode
+	mov mapFPTR, eax
+	INVOKE fscanf, mapFPTR, ADDR inputStr, ADDR ROW
+	INVOKE fscanf, mapFPTR, ADDR inputStr, ADDR COLUMN
+	  ROWLP:
+	  mov CurCol, 0
+	    COLLP:
+		mov eax, COLUMN
+        mul CurRow
+		add eax, CurCol
+		add eax, OFFSET mapData
+		mov MapPos, eax
+		INVOKE fscanf, mapFPTR, ADDR inputStr, MapPos
+		inc CurCol
+		mov eax, COLUMN
+        cmp CurCol, eax
+	    jne COLLP
+	  inc CurRow
+	  mov eax, ROW
+	  cmp CurRow, eax
+	  jne ROWLP
+	INVOKE fclose, mapFPTR
+	ret
+InitMap ENDP
+
 ; check (X, Y) is wall or not
 ; al = 0, if no walls; else, if wall
-.code
 CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
   Local IndexX, IndexY
 
@@ -62,6 +92,32 @@ CheckPositionValid Proc, positionX:DWORD, positionY:DWORD
 
   RET
 CheckPositionValid ENDP
+
+CheckBlockValid Proc, blockX:DWORD, blockY:DWORD
+  mov eax, blockX
+  mul COLUMN
+  add eax, blockY
+  add eax, offset mapData
+
+  mov al, [eax]
+  RET
+CheckBlockValid ENDP
+
+GetBlockID Proc, x:DWORD, y:DWORD, ptrBlockX:DWORD, ptrBlockY:DWORD
+  ; BlockX = x / XScale
+  mov eax, x
+  mov edx, 0
+  div XScale
+  mov esi, ptrBlockX
+  mov [esi], eax
+  ; BlockY = y / YScale
+  mov eax, y
+  mov edx, 0
+  div YScale
+  mov esi, ptrBlockY
+  mov [esi], eax
+  RET
+GetBlockID ENDP
 
 CheckFloatPositionValid Proc, positionX:REAL8, positionY:REAL8
   Local tempX:DWORD, tempY:DWORD, temp:WORD

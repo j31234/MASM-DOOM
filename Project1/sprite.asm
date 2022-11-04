@@ -21,11 +21,11 @@ include draw.inc
 include config.inc
 include map.inc
 include sprite.inc
+include queue.inc
 
 .data
 
-
-NPCList NPC 1 DUP(<200,200>) ;TODO: init NPC position
+NPCList NPC 1 DUP(<134,210>) ;TODO: init NPC position
 NPCNum DWORD 1
 
 
@@ -34,15 +34,219 @@ IMAGE_HALF_WIDTH DWORD 63
 IMAGE_HEIGHT DWORD 132
 IMAGE_RATIO REAL8 0.9545f
 
-SPRITE_SCALE REAL8 80.0f
-SPRITE_HEIGHT_SHIFT REAL8 0.27f
+SPRITE_SCALE REAL8 60.0f
+SPRITE_HEIGHT_SHIFT REAL8 0.20f
 
+NPC_MOVE_STEP = 1
+NPC_BOX_SIZE = 30
 
+; 4 Direction Move
+NPC_MOVE_ACTION_COUNT = 4
+NPC_MOVE_DX SDWORD 0, 0, 1, -1
+NPC_MOVE_DY SDWORD 1, -1, 0, 0
 
+BFSPreNode_SIZE = 128 * 128
+
+.data?
+BFSPreNode POINT BFSPreNode_SIZE DUP(<?,?>) ; 1024 * 1024, for fast index
 
 .code
+MoveNPC PROC, npcID:DWORD
+  ; Move NPC towards player.
+  ; BFS to get to the shortest path. 
+  LOCAL npcX:DWORD, npcY:DWORD, nowX:DWORD, nowY:DWORD, nextX:DWORD, nextY:DWORD
+  LOCAL npcBlockX:DWORD, npcBlockY:DWORD, playerBlockX:DWORD, playerBlockY:DWORD
+  LOCAL npcDx:DWORD, npcDy:DWORD, signedZero:SDWORD
 
-GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
+  mov signedZero, 0
+
+  ; Get npcX, npcY
+  mov esi, npcID
+  mov eax, (NPC PTR NPCList[esi]).posX
+  mov npcX, eax
+  mov eax, (NPC PTR NPCList[esi]).posY
+  mov npcY, eax
+
+  ; Get Block ID for npc and player
+  INVOKE GetBlockID, npcX, npcY, ADDR npcBlockX, ADDR npcBlockY
+  INVOKE GetBlockID, playerX, playerY, ADDR playerBlockX, ADDR playerBlockY
+
+  ; if belongs to the same block
+  mov eax, npcBlockX
+  sub eax, playerBlockX
+  mov ebx, npcBlockY
+  sub ebx, playerBlockY
+  .IF eax == 0 && ebx == 0
+    ; calc npcDx
+    mov eax, playerX
+	sub eax, npcX
+	.IF eax != 0
+	  .IF eax < signedZero ; signed compare
+	    mov npcDx, -NPC_MOVE_STEP
+	  .ELSE
+	    mov npcDx, NPC_MOVE_STEP
+	  .ENDIF
+    .ELSE
+	  mov npcDx, 0
+	.ENDIF
+
+	; calc npcDy
+	mov eax, playerY
+	sub eax, npcY
+	.IF eax != 0
+	  .IF eax < signedZero
+	    mov npcDy, -NPC_MOVE_STEP
+	  .ELSE
+	    mov npcDy, NPC_MOVE_STEP
+	  .ENDIF
+    .ELSE
+	  mov npcDy, 0
+	.ENDIF
+
+	; update npc position
+	jmp UPDATE_NPC_POSITION
+
+    RET
+  .ENDIF
+  
+  ; npc and player belongs to different block
+  ; use bfs
+  
+  ; Initialize BFS State
+  INVOKE crt_memset, offset BFSPreNode, 0ffh, BFSPreNode_SIZE * TYPE BFSPreNode ; x = y = 0xffffffff = -1
+  INVOKE QueueReset
+
+  ; search from (npcBlockX, npcBlockY)
+  INVOKE QueuePush, npcBlockX, npcBlockY
+
+  ; BFSPreNode[npcBlockX, npcBlockY] = Point(-2, -2)
+  ; esi = offset = (npcBlockX + npcBlockY * 128) * sizeof(BFSPreNode)
+  mov esi, npcBlockX
+  shl esi, 7
+  add esi, npcBlockY
+  shl esi, 3
+  mov BFSPreNode[esi].x, -2
+  mov BFSPreNode[esi].y, -2
+
+BFS_START:
+  INVOKE QueuePop, ADDR nowX, ADDR nowY
+
+  ; check target
+  mov eax, nowX
+  sub eax, playerBlockX
+  mov ebx, nowY
+  sub ebx, playerBlockY
+  .IF eax == 0 && ebx == 0
+    jmp BFS_END
+  .ENDIF
+  
+  ; For each action
+  mov ecx, 0
+  .WHILE ecx < NPC_MOVE_ACTION_COUNT
+    ; calc nextX, nextY
+    mov eax, nowX
+	add eax, NPC_MOVE_DX[ecx * 4]
+	mov nextX, eax
+	mov eax, nowY
+	add eax, NPC_MOVE_DY[ecx * 4]
+	mov nextY, eax
+
+	mov esi, nextX
+	shl esi, 7
+	add esi, nextY
+	shl esi, 3
+	INVOKE CheckBlockValid, nextX, nextY
+	mov ebx, BFSPreNode[esi].x
+	.IF al == 0 && ebx == -1  ; NO WALL and not visited
+	  INVOKE QueuePush, nextX, nextY
+
+	  ; BFSPreNode[nextX][nextY] = POINT(nowX, nowY)
+	  mov esi, nextX
+	  shl esi, 7
+	  add esi, nextY
+	  shl esi, 3
+	  mov eax, nowX
+	  mov BFSPreNode[esi].x, eax
+	  mov eax, nowY
+	  mov BFSPreNode[esi].y, eax
+	.ENDIF
+
+	inc ecx
+  .ENDW
+
+  INVOKE QueueIsEmpty
+  .IF eax == 1
+    ; wtf
+	;RET
+  .ENDIF
+  jmp BFS_START
+
+BFS_END:
+TRACEBACK_START:
+  ; traceback from (nowX, nowY) to (npcBlockX, npcBlockY)
+  mov esi, nowX
+  shl esi, 7
+  add esi, nowY
+  shl esi, 3
+
+  mov eax, BFSPreNode[esi].x
+  mov nextX, eax
+  mov eax, BFSPreNode[esi].y
+  mov nextY, eax
+
+  mov eax, nextX
+  sub eax, npcBlockX
+  mov ebx, nextY
+  sub ebx, npcBlockY
+  .IF eax == 0 && ebx == 0
+	jmp TRACEBACK_END
+  .ELSE
+    mov eax, nextX
+	mov nowX, eax
+	mov eax, nextY
+	mov nowY, eax
+    jmp TRACEBACK_START
+  .ENDIF
+
+TRACEBACK_END:
+  ; calc npcDx, npcDy
+  mov eax, playerBlockX
+  sub eax, npcBlockX
+  mov npcDx, eax
+
+  mov eax, playerBlockY
+  sub eax, npcBlockY
+  mov npcDy, eax
+
+UPDATE_NPC_POSITION:
+  ; if npc is too close to player, stop moving
+  mov eax, playerX
+  sub eax, npcX
+  INVOKE crt_abs, eax
+  mov ebx, eax
+
+  mov eax, playerY
+  sub eax, npcY
+  INVOKE crt_abs, eax
+  add ebx, eax
+  .IF ebx < NPC_BOX_SIZE
+    RET
+  .ENDIF
+
+  mov eax, npcX
+  add eax, npcDx
+  mov esi, npcID
+  mov (NPC PTR NPCList[esi]).posX, eax 
+
+  mov eax, npcY
+  add eax, npcDy
+  mov esi, npcID
+  mov (NPC PTR NPCList[esi]).posY, eax 
+
+  RET
+MoveNPC ENDP
+
+GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD, npcID:DWORD
 	LOCAL deltaX:SDWORD, deltaY:SDWORD, theta:REAL8, delta:REAL8, temp:DWORD
 	LOCAL deltaRays:SDWORD, screenX:SDWORD
 	LOCAL dist:REAL8, normDist:REAL8, normDistInt:DWORD
@@ -50,6 +254,10 @@ GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD
 	LOCAL HalfFOVAngle:REAL8, screenDistance:REAL8
 	LOCAL proj:REAL8, projWidth:DWORD, projHeight:DWORD
 	LOCAL posX: DWORD, posY: DWORD, tempPlayerAngle:REAL8
+	; Move NPC
+	INVOKE MoveNPC, npcID
+
+
 	mov eax, x
 	sub eax, playerX
 	mov deltaX, eax

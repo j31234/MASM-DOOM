@@ -21,8 +21,8 @@ include config.inc
 include map.inc
 
 .data
-playerX DWORD 190
-playerY DWORD 270
+playerX DWORD 165
+playerY DWORD 141
 playerAngle REAL8 3.6
 playerBlood DWORD 100
 speedX DWORD 0

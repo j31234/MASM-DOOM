@@ -132,6 +132,9 @@
     <MASM Include="sound.asm">
       <Filter>源文件</Filter>
     </MASM>
+    <MASM Include="queue.asm">
+      <Filter>源文件</Filter>
+    </MASM>
   </ItemGroup>
   <ItemGroup>
     <None Include="draw.inc">
@@ -150,6 +153,9 @@
       <Filter>头文件</Filter>
     </None>
     <None Include="sound.inc">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="queue.inc">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>
