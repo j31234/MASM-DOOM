@@ -139,29 +139,13 @@ quicksort proc
  xor ebx, ebx;
  mov esi, l ;i
  mov ebx, r ;j
- ;mov eax, dat[esi * type dat]
 
-
- ;xor edx, edx
- ;mov eax, esi
- ;mov esi, SIZE renderObject
-; mul esi
- ;mov esi, eax
  xor edx, edx
  mov eax, esi
  mov edi, SIZE renderObject
  mul edi
  mov edi, eax
  mov eax, (renderObject PTR renderList[edi]).dist
-
-
- ;xor edx, edx
-;mov eax, esi
-;mov esi, SIZE renderObject
-;div esi
-;mov esi, eax
-
-
 
 sort_again:
  cmp ebx,esi;    while (i!=j)
@@ -329,24 +313,69 @@ DrawWin PROC,  hdc:HDC, drawdc:HDC
 	RET
 DrawWin ENDP
 
+DrawBlood PROC, hdc:HDC, drawdc:HDC
+	; hundred
+	xor edx, edx
+	mov eax, playerBlood
+	mov ebx, 100
+	div ebx
+	.IF eax == 1
+		mov esi, 1
+		mov esi, hBloodBitmapList[esi * TYPE hBloodBitmapList]
+		INVOKE DrawTransparentBitmap, hdc, drawdc, 10, 10, 64, 64, 0, 0, 64, 64, esi, 0
+	.ENDIF
+
+	; ten
+	xor edx, edx
+	mov eax, playerBlood
+	mov ebx, 10
+	div ebx
+	.IF eax == 0
+		jmp DRAW_SINGLE
+	.ELSEIF eax == 10
+		mov eax, 0
+	.ENDIF
+	mov esi, hBloodBitmapList[eax * TYPE hBloodBitmapList]
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 80, 10, 64, 64, 0, 0, 64, 64, esi, 0
+
+DRAW_SINGLE:
+	; single
+	xor edx, edx
+	mov eax, playerBlood
+	mov ebx, 10
+	div ebx
+	mov esi, hBloodBitmapList[edx * TYPE hBloodBitmapList]
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 150, 10, 64, 64, 0, 0, 64, 64, esi, 0
+
+	; percent
+	mov eax, 10
+	mov esi, hBloodBitmapList[eax * TYPE hBloodBitmapList]
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 220, 10, 64, 64, 0, 0, 64, 64, esi, 0
+
+	RET
+DrawBlood ENDP
 
 DrawMain Proc, hdc:HDC, drawdc:HDC
   pushad
-
+  
   mov renderHead, 0
   mov renderTail, 0
 
   INVOKE playerStateCheck ; 0 for dead, 1 for alive, 2 for no-attracked state, 3 for win
 
+  ; dead
   .IF eax == 0
 	INVOKE DrawEnd, hdc, drawdc
 	jmp StartRender
+  ; no-attracked
   .ELSEIF eax == 3
 	INVOKE DrawWin, hdc, drawdc
   .ENDIF
 
+  
   ; INVOKE DrawMap, hdc
   INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
+  INVOKE DrawBlood, hdc, drawdc
   INVOKE DrawBackground, hdc, drawdc, 0, 0
   INVOKE DrawFloor, hdc
   INVOKE DrawNPC, hdc, drawdc
@@ -355,11 +384,12 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   ; Draw Weapon
   INVOKE DrawWeapon, hdc, drawdc
   
+  ; Reset cursor position to the middle of the window
+  INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y
+  
 StartRender:
   INVOKE Render, hdc, drawdc
   
-  ; Reset cursor position to the middle of the window
-  INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y
 
   popad
   RET

@@ -6,10 +6,12 @@ include windows.inc
 NPC STRUCT
 	posX DWORD ?
 	posY DWORD ?
+	blood DWORD ?
 NPC ENDS
 
 EXTERNDEF NPCList: NPC
 EXTERNDEF NPCNum: DWORD
+EXTERNDEF NPCAliveNum: DWORD
 
 GetSprite Proto, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD, npcID:DWORD
 ENDIF

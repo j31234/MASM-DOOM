@@ -27,6 +27,7 @@ include queue.inc
 
 NPCList NPC 1 DUP(<134,210>) ;TODO: init NPC position
 NPCNum DWORD 1
+NPCAliveNum DWORD 1
 
 
 IMAGE_WIDTH DWORD 126

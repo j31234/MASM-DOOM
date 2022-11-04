@@ -19,12 +19,14 @@ includelib msvcrt.lib
 include player.inc
 include config.inc
 include map.inc
+include sprite.inc
 
 .data
-playerX DWORD 165
-playerY DWORD 141
+playerX DWORD 150
+playerY DWORD 220
 playerAngle REAL8 3.6
 playerBlood DWORD 100
+playerProtectedFrame DWORD 200
 speedX DWORD 0
 speedY DWORD 0
 .code
@@ -157,9 +159,78 @@ DrawPlayer PROC, hdc: HDC
   RET
 DrawPlayer ENDP
 
-; 
+checkAttack PROC
+	LOCAL temp:DWORD, deltaX: REAL8, deltaY: REAL8
+	mov esi, 0
+	.WHILE esi < NPCAliveNum
+		FINIT
+		FILD (NPC PTR NPCList[esi]).posX
+		FILD playerX
+		FSUB
+		FST deltaX
+		FILD (NPC PTR NPCList[esi]).posY
+		FILD playerY
+		FSUB
+		FST deltaY
+		FLD deltaX
+		FMUL deltaX
+		FLD deltaY
+		FMUL deltaY
+		FADD
+		FSQRT
+		mov temp, ATTACK_RADIUM
+		FILD temp
+		FCOM
+		FSTSW ax
+		SAHF
+		jc NO_ATTACKED
+		mov eax, playerBlood
+		.IF eax < ATTACK_HURT
+			mov eax, 0
+		.ELSE
+			sub eax, ATTACK_HURT
+		.ENDIF
+		mov playerBlood, eax
+		mov playerProtectedFrame, ATTACK_INTERVAL
+	NO_ATTACKED:
+		inc esi
+	.ENDW
+	RET
+checkAttack ENDP
+
+; 0 for dead, 1 for alive, 2 for protected-frame state, 3 for win 
 playerStateCheck PROC
-	mov eax, 3
+	; dead check
+	mov eax, playerBlood
+	cmp eax, 0
+	je ExitPlayerStateCheck
+
+	; protected state check
+	mov eax, playerProtectedFrame
+	.IF eax > 0
+		dec eax
+		mov playerProtectedFrame, eax
+		mov eax, 2
+		jmp ExitPlayerStateCheck
+	.ENDIF
+
+	; win check
+	mov eax, NPCAliveNum
+	.IF eax == 0
+		mov eax, 3
+		jmp ExitPlayerStateCheck
+	.ENDIF
+
+	; be attacked check
+	invoke checkAttack
+
+	; dead check
+	mov eax, playerBlood
+	cmp eax, 0
+	je ExitPlayerStateCheck
+
+	mov eax, 1
+ExitPlayerStateCheck:
 	RET
 playerStateCheck ENDP
 
