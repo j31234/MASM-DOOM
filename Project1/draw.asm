@@ -335,7 +335,7 @@ DrawEnd PROC,  hdc:HDC, drawdc:HDC
 DrawEnd ENDP
 
 DrawWin PROC,  hdc:HDC, drawdc:HDC
-	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, 800, 600, 50, 50, 1600, 800, hWin, 0
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, WINDOW_WIDTH + 50, WINDOW_HEIGHT, 0, 0, 1600, 900, hWin, 0
 	RET
 DrawWin ENDP
 

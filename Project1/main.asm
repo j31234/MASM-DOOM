@@ -70,6 +70,10 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_BACKGROUND
 	mov hBackground, eax
 
+	IDB_INDEX = 177
+	INVOKE LoadBitmap, hInstance, IDB_INDEX
+	;mov hIndex, eax
+
 	IDB_NPC1 = 111
 	INVOKE LoadBitmap, hInstance, IDB_NPC1
 	mov hNPC1, eax
@@ -77,6 +81,14 @@ WinMain PROC
 	IDB_NPC1_ATTACK = 174
 	INVOKE LoadBitmap, hInstance, IDB_NPC1_ATTACK
 	mov hCacoAttack, eax
+
+	IDB_NPC1_DEATH = 175
+	INVOKE LoadBitmap, hInstance, IDB_NPC1_DEATH
+	;mov hCacoDeath, eax
+
+	IDB_NPC1_HURT = 176
+	INVOKE LoadBitmap, hInstance, IDB_NPC1_HURT
+	;mov hCacoHurt, eax
 
 	; Load 6 bitmaps for weapon animation
 	mov ebx, 0

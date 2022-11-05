@@ -7,6 +7,7 @@ include config.inc
 .data
 MOUSE_SENSITIVITY REAL8 0.002
 PLAYER_SPEED REAL8 0.5
+hIndex DWORD ?
 hTexture1 DWORD ?
 hTexture2 DWORD ?
 hTexture3 DWORD ?
@@ -17,6 +18,8 @@ hWeaponBitmapList DWORD 6 DUP(?)
 cacoIDBList DWORD 153, 154, 155, 156, 157, 158, 159, 160
 hCacoBitmapList DWORD 8 DUP(?)
 hCacoAttack DWORD ?
+hCacoHurt DWORD ?
+hCacoDeath DWORD ?
 bloodIDBList DWORD 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172
 hBloodBitmapList DWORD 11 DUP(?)
 hEnd DWORD ?
