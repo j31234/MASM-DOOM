@@ -7,7 +7,7 @@ NPC STRUCT
 	posX DWORD ?
 	posY DWORD ?
 	nowIDB DWORD ?
-	blood DWORD 10
+	blood DWORD 100
 	attacking DWORD 0
 	attackedFrame DWORD 0
 	NPCType DWORD 1

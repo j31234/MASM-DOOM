@@ -691,6 +691,9 @@ finishAddDelta:
 	mov temp, 2
 	FIDIV temp
 	FSUB ; TODO:HEIGHT_SHIFT
+	mov temp, 10
+	FILD temp
+	FADD
 	mov esi, posY
 	FIST DWORD PTR [esi]
 

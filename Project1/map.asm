@@ -634,7 +634,7 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
 
   FINIT
   FLD wallDistance
-  mov temp, 1000 ;avoid float number comparison
+  mov temp, 1100 ;avoid float number comparison
   FIMUL temp
   FIST wallDistanceInt
 

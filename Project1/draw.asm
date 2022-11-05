@@ -91,7 +91,9 @@ DrawBitmap ENDP
 DrawNPCBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD, dist:DWORD
 	LOCAL oldObject:HGDIOBJ, color:DWORD
   pushad
-  INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, pic, 1, dist
+    
+	INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, pic, 1, dist
+
   popad
   RET
 DrawNPCBitmap ENDP
