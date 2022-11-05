@@ -289,9 +289,10 @@ DrawFloor Proc, hdc:HDC
 DrawFloor ENDP
 
 DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
-	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDistInt:DWORD, delta:REAL8, normDist:REAL8
+	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDistInt:DWORD, delta:REAL8, normDist:REAL8, tempFloat:REAL8
 	mov eax, npcID
 	mov edx, (NPC PTR NPCList[eax]).blood
+	; alive
 	.IF edx > 0
 		; Move NPC
 		pushad
@@ -301,16 +302,31 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 		; Get NPC position
 		pushad
 		mov esi, npcID
-			INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, eax
+		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, ADDR tempFloat, eax
 		mov esi, npcID
 		mov eax, (NPC PTR NPCList[esi]).nowIDB
 		; Draw NPC
+		; if attacking player
 		mov ebx, (NPC PTR NPCList[esi]).attacking
 		.IF ebx == 1
 			mov eax, hCacoAttack
 		.ENDIF
+		; if be attacked
+		mov ebx, (NPC PTR NPCList[esi]).attackedFrame
+		.IF ebx == 0
+			nop
+		.ELSE
+			dec ebx
+			mov (NPC PTR NPCList[esi]).attackedFrame, ebx
+			mov eax, hCacoHurt
+		.ENDIF
 		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
 		popad
+	; dead
+	.ELSE
+		mov esi, npcID
+		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, ADDR tempFloat, eax
+		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hCacoDeath, normDistInt
 	.ENDIF
 	RET
 DrawSingleNPC ENDP
@@ -330,12 +346,12 @@ NPC_LOOP:
 DrawNPC ENDP
 
 DrawEnd PROC,  hdc:HDC, drawdc:HDC
-	INVOKE DrawBitmap, hdc, drawdc, 0, 0, 800, 600, 50, 50, 1600, 800, hEnd, 0
+	INVOKE DrawBitmap, hdc, drawdc, 0, 0, 800, 600, 0, 0, 1600, 800, hEnd, 0
 	RET
 DrawEnd ENDP
 
 DrawWin PROC,  hdc:HDC, drawdc:HDC
-	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, WINDOW_WIDTH + 50, WINDOW_HEIGHT, 0, 0, 1600, 900, hWin, 0
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 1800, 800, hWin, 0
 	RET
 DrawWin ENDP
 
@@ -404,11 +420,13 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   INVOKE DrawBlood, hdc, drawdc
   INVOKE DrawBackground, hdc, drawdc, 0, 0
   INVOKE DrawFloor, hdc
-  INVOKE DrawNPC, hdc, drawdc
   INVOKE DrawWall, hdc, drawdc
 
   ; Draw Weapon
   INVOKE DrawWeapon, hdc, drawdc
+
+  
+  INVOKE DrawNPC, hdc, drawdc
 
   ; Reset cursor position to the middle of the window
   INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y

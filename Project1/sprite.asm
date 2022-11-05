@@ -26,7 +26,7 @@ include queue.inc
 
 .data
 
-NPCList NPC  <600,210,>, <250,800,> ;TODO: init NPC position
+NPCList NPC  <600,210,,,,0>, <250,800,,,,0> ;TODO: init NPC position
 NPCNum DWORD 2
 NPCAliveNum DWORD 2
 
@@ -355,18 +355,54 @@ MoveNPC ENDP
 
 ; damage targeted npc. return 1 if hurted, 2 if dead, 0 otherwise
 NPCDamage PROC damage:DWORD, npcID:DWORD
+	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDist:REAL8, normDistInt:DWORD, delta_res:REAL8, spriteDist:REAL8
+	LOCAL pWallX:DWORD, pWallY:DWORD, pWallDistance:REAL8, pOffset:REAL8, pTextureType:DWORD
 	local npcindex:DWORD
 	mov eax, npcID
 	mov ebx, SIZE NPC
 	mul ebx
 	mov npcindex, eax
 	mov eax, (NPC PTR NPCList[eax]).blood
+
+	; bullet collision check
+	pushad
+	invoke GetSprite, addr posX, addr posY, addr projWidth, addr projHeight, addr normDist, addr normDistInt, addr delta_res, addr spriteDist, npcindex
+	invoke RayCasting, playerAngle, addr pWallX, addr pWallY, addr pWallDistance, addr pOffset, addr pTextureType
+	popad
+	; check shot angle
+	FINIT
+	FILD IMAGE_HALF_WIDTH ; NPC half width
+	FLD spriteDist
+	FPATAN
+	FILD IMAGE_HALF_WIDTH 
+	FLD spriteDist
+	FPATAN
+	FMUL; normDist^2
+	FLD delta_res
+	FMUL delta_res ;delta_res^2
+	FCOM
+	FSTSW ax
+	SAHF
+	jnc BULLET_MISS ; arctan|width / normDist| < |delta|
+	; check if walls block the bullet
+	FINIT
+	FLD pWallDistance
+	FLD normDist
+	FCOM
+	FSTSW ax
+	SAHF
+	jnc BULLET_MISS
+
+	mov eax, npcindex
+	mov eax, (NPC PTR NPCList[eax]).blood
 	.IF eax == 0
 		nop
 	.ELSEIF eax <= damage
 		mov eax, npcindex
 		mov (NPC PTR NPCList[eax]).blood, 0
-		dec NPCAliveNum
+		mov edi, NPCAliveNum
+		dec edi
+		mov NPCAliveNum, edi
 		mov eax, 2
 	.ELSE
 		mov ebx, damage
@@ -374,10 +410,13 @@ NPCDamage PROC damage:DWORD, npcID:DWORD
 		sub (NPC PTR NPCList[eax]).blood, ebx
 		mov eax, 1
 	.ENDIF
+	mov edi, npcindex
+	mov (NPC PTR NPCList[edi]).attackedFrame, 20
+BULLET_MISS:
 	RET
 NPCDamage ENDP
 
-GetSprite PROC posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:PTR DWORD, normDist:PTR REAL8, normDistInt:PTR DWORD, delta_res:PTR REAL8, npcID:DWORD
+GetSprite PROC posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:PTR DWORD, normDist:PTR REAL8, normDistInt:PTR DWORD, delta_res:PTR REAL8, dist_res:PTR REAL8, npcID:DWORD
 	LOCAL deltaX:SDWORD, deltaY:SDWORD, theta:REAL8, delta:REAL8, temp:DWORD
 	LOCAL deltaRays:SDWORD, screenX:SDWORD
 	LOCAL dist:REAL8
@@ -622,6 +661,9 @@ exit_get_sprite:
 	FINIT
 	FLD delta
 	mov esi, delta_res
+	FST REAL8 PTR [esi]
+	FLD dist
+	mov esi, dist_res
 	FST REAL8 PTR [esi]
 	RET
 GetSprite ENDP

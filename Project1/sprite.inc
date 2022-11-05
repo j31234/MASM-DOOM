@@ -9,13 +9,14 @@ NPC STRUCT
 	nowIDB DWORD ?
 	blood DWORD 100
 	attacking DWORD 0
+	attackedFrame DWORD 0
 NPC ENDS
 
 EXTERNDEF NPCList: NPC
 EXTERNDEF NPCNum: DWORD
 EXTERNDEF NPCAliveNum: DWORD
 
-GetSprite Proto, posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:PTR DWORD, normDist:PTR REAL8, normDistInt:PTR DWORD, delta_res:PTR REAL8, npcID:DWORD
+GetSprite Proto, posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:PTR DWORD, normDist:PTR REAL8, normDistInt:PTR DWORD, delta_res:PTR REAL8, dist_res:PTR REAL8, npcID:DWORD
 MoveNPC Proto, npcID:DWORD
 NPCDamage Proto, damage:DWORD, npcID:DWORD 
 ENDIF

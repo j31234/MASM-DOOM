@@ -84,11 +84,11 @@ WinMain PROC
 
 	IDB_NPC1_DEATH = 175
 	INVOKE LoadBitmap, hInstance, IDB_NPC1_DEATH
-	;mov hCacoDeath, eax
+	mov hCacoDeath, eax
 
 	IDB_NPC1_HURT = 176
 	INVOKE LoadBitmap, hInstance, IDB_NPC1_HURT
-	;mov hCacoHurt, eax
+	mov hCacoHurt, eax
 
 	; Load 6 bitmaps for weapon animation
 	mov ebx, 0
