@@ -25,7 +25,7 @@ include queue.inc
 
 .data
 
-NPCList NPC  <134,210,>, <250,250,> ;TODO: init NPC position
+NPCList NPC  <600,210,>, <250,800,> ;TODO: init NPC position
 NPCNum DWORD 2
 NPCAliveNum DWORD 2
 
