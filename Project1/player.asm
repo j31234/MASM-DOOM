@@ -166,7 +166,7 @@ checkAttack PROC
 	LOCAL temp:DWORD, deltaX: REAL8, deltaY: REAL8
 	mov esi, 0
 	mov edi, 0
-	.WHILE edi < NPCAliveNum
+	.WHILE edi < NPCNum
 		FINIT
 		FILD (NPC PTR NPCList[esi]).posX
 		FILD playerX
