@@ -35,7 +35,9 @@ OnWeaponFired Proc
   INVOKE ShotgunSound
   mov esi, 0
   .WHILE esi < NPCNum
+	push esi
     INVOKE NPCDamage, WEAPON_HURT, esi
+	pop esi
 	.IF eax > soundType
 	  mov soundType, eax
     .ENDIF
