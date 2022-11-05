@@ -17,6 +17,8 @@ includelib msimg32.lib
 
 ; Custom Header
 include weapon.inc
+include map.inc
+include sprite.inc
 include draw.inc
 include config.inc
 include sound.inc
@@ -27,8 +29,23 @@ frameCount DWORD 0
 
 .code
 OnWeaponFired Proc
+  LOCAL soundType:DWORD
+  mov soundType, 0
   ; TODO: Bullet Collision Detection
   INVOKE ShotgunSound
+  mov esi, 0
+  .WHILE esi < NPCNum
+    INVOKE NPCDamage, WEAPON_HURT, esi
+	.IF eax > soundType
+	  mov soundType, eax
+    .ENDIF
+	inc esi
+  .ENDW
+  .IF soundType == 1
+    INVOKE NPCPainSound
+  .ELSEIF soundType == 2
+    INVOKE NPCDeathSound
+  .ENDIF
   RET
 OnWeaponFired ENDP
 

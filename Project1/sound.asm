@@ -24,12 +24,15 @@ include sound.inc
 SUINFO STARTUPINFO <>
 PRCINFO PROCESS_INFORMATION <>
 
-bgmName     BYTE "DoomTheme.wav", 0
+bgmName      BYTE "DoomTheme.wav", 0
 
-processName BYTE "soundplayer.exe", 0
-shotgunName BYTE "player_shotgun.wav", 0
-plpainName  BYTE "player_pain.wav", 0
-pldeathName BYTE "player_death.wav", 0
+processName  BYTE "soundplayer.exe", 0
+shotgunName  BYTE "player_shotgun.wav", 0
+plpainName   BYTE "player_pain.wav", 0
+pldeathName  BYTE "player_death.wav", 0
+npcpainName  BYTE "npc_pain.wav", 0
+npcdeathName BYTE "npc_death.wav", 0
+npcatkName   BYTE "npc_attack.wav", 0
 
 .code
 PlayBGM PROC
@@ -58,4 +61,20 @@ PlayerDeathSound PROC
   INVOKE CreateProcess, ADDR processName, ADDR pldeathName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
   RET
 PlayerDeathSound ENDP
+
+NPCPainSound PROC
+  INVOKE CreateProcess, ADDR processName, ADDR npcpainName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  RET
+NPCPainSound ENDP
+
+NPCDeathSound PROC
+  INVOKE CreateProcess, ADDR processName, ADDR npcdeathName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  RET
+NPCDeathSound ENDP
+
+NPCATKSound PROC
+  INVOKE CreateProcess, ADDR processName, ADDR npcatkName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  RET
+NPCATKSound ENDP
+
 END

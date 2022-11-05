@@ -189,11 +189,14 @@ checkAttack PROC
 		SAHF
 		jc NO_ATTACKED
 		.IF playerBlood <= ATTACK_HURT
-			INVOKE PlayerDeathSound
-			INVOKE StopBGM
+			.IF playerBlood != 0
+				INVOKE PlayerDeathSound
+				INVOKE StopBGM
+			.ENDIF
 			mov playerBlood, 0
 		.ELSE
 			.IF playerPainCount == 0
+				INVOKE NPCATKSound
 				INVOKE PlayerPainSound
 				mov playerPainCount, 60
 				mov playerProtectedFrame, ATTACK_INTERVAL

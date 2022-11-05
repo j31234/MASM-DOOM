@@ -9,5 +9,8 @@ StopBGM          PROTO
 ShotgunSound     Proto
 PlayerPainSound  Proto
 PlayerDeathSound Proto
+NPCPainSound     Proto
+NPCDeathSound    Proto
+NPCATKSound      Proto
 
 ENDIF

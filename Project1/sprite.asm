@@ -21,6 +21,7 @@ include draw.inc
 include config.inc
 include map.inc
 include sprite.inc
+include sound.inc
 include queue.inc
 
 .data
@@ -351,6 +352,30 @@ UPDATE_NPC_POSITION:
 
   RET
 MoveNPC ENDP
+
+; damage targeted npc. return 1 if hurted, 2 if dead, 0 otherwise
+NPCDamage PROC damage:DWORD, npcID:DWORD
+	local npcindex:DWORD
+	mov eax, npcID
+	mov ebx, SIZE NPC
+	mul ebx
+	mov npcindex, eax
+	mov eax, (NPC PTR NPCList[eax]).blood
+	.IF eax == 0
+		nop
+	.ELSEIF eax <= damage
+		mov eax, npcindex
+		mov (NPC PTR NPCList[eax]).blood, 0
+		dec NPCAliveNum
+		mov eax, 2
+	.ELSE
+		mov ebx, damage
+		mov eax, npcindex
+		sub (NPC PTR NPCList[eax]).blood, ebx
+		mov eax, 1
+	.ENDIF
+	RET
+NPCDamage ENDP
 
 GetSprite PROC posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:PTR DWORD, normDist:PTR REAL8, normDistInt:PTR DWORD, delta_res:PTR REAL8, npcID:DWORD
 	LOCAL deltaX:SDWORD, deltaY:SDWORD, theta:REAL8, delta:REAL8, temp:DWORD
