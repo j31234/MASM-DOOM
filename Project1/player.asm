@@ -20,6 +20,7 @@ include player.inc
 include config.inc
 include map.inc
 include sprite.inc
+include sound.inc
 
 .data
 playerX DWORD 150
@@ -27,6 +28,7 @@ playerY DWORD 220
 playerAngle REAL8 3.6
 playerBlood DWORD 100
 playerProtectedFrame DWORD 200
+playerPainCount DWORD 0
 speedX DWORD 0
 speedY DWORD 0
 .code
@@ -184,14 +186,19 @@ checkAttack PROC
 		FSTSW ax
 		SAHF
 		jc NO_ATTACKED
-		mov eax, playerBlood
-		.IF eax < ATTACK_HURT
-			mov eax, 0
+		; mov eax, playerBlood
+		.IF playerBlood <= ATTACK_HURT
+			INVOKE PlayerDeathSound
+			mov playerBlood, 0
 		.ELSE
-			sub eax, ATTACK_HURT
+			.IF playerPainCount == 0
+				INVOKE PlayerPainSound
+				mov playerPainCount, 60
+				mov playerProtectedFrame, ATTACK_INTERVAL
+			.ENDIF
+			sub playerBlood, ATTACK_HURT
 		.ENDIF
-		mov playerBlood, eax
-		mov playerProtectedFrame, ATTACK_INTERVAL
+		; mov playerBlood, eax
 	NO_ATTACKED:
 		inc esi
 	.ENDW
@@ -200,16 +207,19 @@ checkAttack ENDP
 
 ; 0 for dead, 1 for alive, 2 for protected-frame state, 3 for win 
 playerStateCheck PROC
+	; decrease playerPainCount so that pain sound can be played
+	.IF playerPainCount > 0
+		dec playerPainCount
+	.ENDIF
+
 	; dead check
 	mov eax, playerBlood
 	cmp eax, 0
 	je ExitPlayerStateCheck
 
 	; protected state check
-	mov eax, playerProtectedFrame
-	.IF eax > 0
-		dec eax
-		mov playerProtectedFrame, eax
+	.IF playerProtectedFrame > 0
+		dec playerProtectedFrame
 		mov eax, 2
 		jmp ExitPlayerStateCheck
 	.ENDIF

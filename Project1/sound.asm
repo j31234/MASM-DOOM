@@ -23,10 +23,22 @@ SUINFO STARTUPINFO <>
 PRCINFO PROCESS_INFORMATION <>
 processName BYTE "soundplayer.exe", 0
 shotgunName BYTE "player_shotgun.wav", 0
+plpainName  BYTE "player_pain.wav", 0
+pldeathName BYTE "player_death.wav", 0
 
 .code
 ShotgunSound PROC
   INVOKE CreateProcess, ADDR processName, ADDR shotgunName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
   RET
 ShotgunSound ENDP
+
+PlayerPainSound PROC
+  INVOKE CreateProcess, ADDR processName, ADDR plpainName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  RET
+PlayerPainSound ENDP
+
+PlayerDeathSound PROC
+  INVOKE CreateProcess, ADDR processName, ADDR pldeathName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  RET
+PlayerDeathSound ENDP
 END
