@@ -288,15 +288,9 @@ DrawFloor Proc, hdc:HDC
   RET
 DrawFloor ENDP
 
-DrawNPC Proc, hdc:HDC, drawdc:HDC
+DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDistInt:DWORD, delta:REAL8, normDist:REAL8
-	LOCAL npcID:DWORD
-	mov ecx, NPCNum
-NPC_LOOP:
-	mov eax, ecx
-	dec eax
-	mov ebx, SIZE NPC
-	mul ebx
+	mov eax, npcID
 	mov edx, (NPC PTR NPCList[eax]).blood
 	.IF edx > 0
 		; Move NPC
@@ -306,15 +300,31 @@ NPC_LOOP:
 		popad
 		; Get NPC position
 		pushad
-		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, eax
-
+		mov esi, npcID
+			INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, eax
 		mov esi, npcID
 		mov eax, (NPC PTR NPCList[esi]).nowIDB
 		; Draw NPC
+		mov ebx, (NPC PTR NPCList[esi]).attacking
+		.IF ebx == 1
+			mov eax, hCacoAttack
+		.ENDIF
 		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
-
 		popad
 	.ENDIF
+	RET
+DrawSingleNPC ENDP
+
+DrawNPC Proc, hdc:HDC, drawdc:HDC
+	mov ecx, NPCNum
+NPC_LOOP:
+	mov eax, ecx
+	dec eax
+	mov ebx, SIZE NPC
+	mul ebx
+		pushad
+		INVOKE DrawSingleNPC, hdc, drawdc, eax
+		popad
 	loop NPC_LOOP
 	RET
 DrawNPC ENDP

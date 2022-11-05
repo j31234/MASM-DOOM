@@ -165,7 +165,8 @@ DrawPlayer ENDP
 checkAttack PROC
 	LOCAL temp:DWORD, deltaX: REAL8, deltaY: REAL8
 	mov esi, 0
-	.WHILE esi < NPCAliveNum
+	mov edi, 0
+	.WHILE edi < NPCAliveNum
 		FINIT
 		FILD (NPC PTR NPCList[esi]).posX
 		FILD playerX
@@ -199,8 +200,13 @@ checkAttack PROC
 			.ENDIF
 			sub playerBlood, ATTACK_HURT
 		.ENDIF
+		mov (NPC PTR NPCList[esi]).attacking, 1
+		jmp NEXT_CHECK_ATTACK
 	NO_ATTACKED:
-		inc esi
+		mov (NPC PTR NPCList[esi]).attacking, 0
+	NEXT_CHECK_ATTACK:
+		add esi, SIZE NPC
+		inc edi
 	.ENDW
 	RET
 checkAttack ENDP

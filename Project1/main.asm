@@ -74,6 +74,10 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_NPC1
 	mov hNPC1, eax
 
+	IDB_NPC1_ATTACK = 174
+	INVOKE LoadBitmap, hInstance, IDB_NPC1_ATTACK
+	mov hCacoAttack, eax
+
 	; Load 6 bitmaps for weapon animation
 	mov ebx, 0
 	.WHILE ebx < 6
