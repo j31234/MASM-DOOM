@@ -7,7 +7,8 @@ include config.inc
 .data
 MOUSE_SENSITIVITY REAL8 0.002
 PLAYER_SPEED REAL8 0.5
-hIndex DWORD ?
+hIndex1 DWORD ?
+hIndex2 DWORD ?
 hTexture1 DWORD ?
 hTexture2 DWORD ?
 hTexture3 DWORD ?

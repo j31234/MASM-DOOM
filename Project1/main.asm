@@ -40,6 +40,7 @@ winRect   RECT <>
 hMainWnd  DWORD ?
 hInstance DWORD ?
 WINDOW_STYLE = WS_POPUP
+gameState DWORD 1 ; 1/2 for index page & 0 for begin
 
 ;=================== CODE =========================
 .code
@@ -70,9 +71,13 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_BACKGROUND
 	mov hBackground, eax
 
-	IDB_INDEX = 177
-	INVOKE LoadBitmap, hInstance, IDB_INDEX
-	;mov hIndex, eax
+	IDB_INDEX1 = 177
+	INVOKE LoadBitmap, hInstance, IDB_INDEX1
+	mov hIndex1, eax
+
+	IDB_INDEX2 = 178
+	INVOKE LoadBitmap, hInstance, IDB_INDEX2
+	mov hIndex2, eax
 
 	IDB_NPC1 = 111
 	INVOKE LoadBitmap, hInstance, IDB_NPC1
@@ -199,6 +204,7 @@ drawHdc    HDC ?
 memBitmap HBITMAP ?
 oldPen    HGDIOBJ ?
 oldBrush  HGDIOBJ ?
+oldObject HGDIOBJ ?
 ps PAINTSTRUCT <>
 
 .code
@@ -245,8 +251,33 @@ COMMENT @
 
 	  ; Background = white
 	  INVOKE BitBlt, memHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdc, 0, 0, WHITENESS
-	  INVOKE DrawMain, memHdc, drawHdc
+	  .IF gameState == 0
+		; Draw Main
+		INVOKE DrawMain, memHdc, drawHdc
+	  .ELSE
+	  	
+		; every 10 frame change the index1 <-> index2
+		xor edx, edx
+	    mov eax, gameState
+		mov ebx, 10
+		div ebx
+		.IF eax < 2
+			INVOKE SelectObject, drawHdc, hIndex1
+			mov oldObject, eax
+		.ELSEIF eax >= 2 && eax <= 3
+			INVOKE SelectObject, drawHdc, hIndex2
+			mov oldObject, eax
+		.ELSE
+			INVOKE SelectObject, drawHdc, hIndex2
+			mov oldObject, eax
+			mov gameState, 0
+		.ENDIF
+		add gameState, 1
+		INVOKE StretchBlt, memHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, drawHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SRCCOPY
 
+		INVOKE SelectObject, drawHdc, oldObject
+	  .ENDIF
+	  
 	  ; Alt the true device context
 	  INVOKE BitBlt, hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memHdc, 0, 0, SRCCOPY
 
@@ -263,7 +294,10 @@ ReleaseResources:
 	.ELSEIF eax == WM_KEYDOWN
 	  .IF wParam == VK_ESCAPE
 	    INVOKE PostQuitMessage,0
+	  .ELSEIF wParam == VK_SPACE
+		mov gameState, 0
 	  .ENDIF
+	  
 	  jmp WinProcExit
 	.ELSE		; other message?
 	  INVOKE DefWindowProc, hWnd, localMsg, wParam, lParam
