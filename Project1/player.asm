@@ -186,7 +186,6 @@ checkAttack PROC
 		FSTSW ax
 		SAHF
 		jc NO_ATTACKED
-		; mov eax, playerBlood
 		.IF playerBlood <= ATTACK_HURT
 			INVOKE PlayerDeathSound
 			mov playerBlood, 0
@@ -198,7 +197,6 @@ checkAttack PROC
 			.ENDIF
 			sub playerBlood, ATTACK_HURT
 		.ENDIF
-		; mov playerBlood, eax
 	NO_ATTACKED:
 		inc esi
 	.ENDW
@@ -225,8 +223,7 @@ playerStateCheck PROC
 	.ENDIF
 
 	; win check
-	mov eax, NPCAliveNum
-	.IF eax == 0
+	.IF NPCAliveNum == 0
 		mov eax, 3
 		jmp ExitPlayerStateCheck
 	.ENDIF
