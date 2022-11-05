@@ -188,6 +188,7 @@ checkAttack PROC
 		jc NO_ATTACKED
 		.IF playerBlood <= ATTACK_HURT
 			INVOKE PlayerDeathSound
+			INVOKE StopBGM
 			mov playerBlood, 0
 		.ELSE
 			.IF playerPainCount == 0

@@ -4,13 +4,11 @@ OPTION  CaseMap:None
 
 ; MASM32 Headers
 include windows.inc
-include winmm.inc
 include user32.inc
 include kernel32.inc
 include gdi32.inc
 
 ; MASM32 Library
-includelib winmm.lib
 includelib user32.lib
 includelib kernel32.lib
 includelib gdi32.lib
@@ -20,6 +18,7 @@ include config.inc
 include map.inc
 include draw.inc
 include player.inc
+include sound.inc
 
 FUNCPROTO       TYPEDEF PROTO 
 FUNCPTR         TYPEDEF PTR FUNCPROTO
@@ -135,6 +134,9 @@ WinMain PROC
 ; Read map data from file
 	INVOKE InitMap
 
+; Start playing bgm
+	INVOKE PlayBGM
+
 ; Show and draw the window.
 	INVOKE ShowWindow, hMainWnd, SW_SHOW
 	INVOKE UpdateWindow, hMainWnd
@@ -145,9 +147,6 @@ WinMain PROC
 
 ; Frame timer
     INVOKE SetTimer, hMainWnd, NULL, DELTA_TIME, NULL
-
-; Play background music
-	INVOKE PlaySound, ADDR bgmName, NULL, SND_ASYNC OR SND_LOOP OR SND_FILENAME
 
 ; Begin the program's message-handling loop.
 Message_Loop:
