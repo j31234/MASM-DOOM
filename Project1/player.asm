@@ -17,14 +17,18 @@ includelib msvcrt.lib
 
 ; Custom Header
 include player.inc
-include draw.inc
 include config.inc
 include map.inc
+include sprite.inc
+include sound.inc
 
 .data
-playerX DWORD 165
-playerY DWORD 141
+playerX DWORD 150
+playerY DWORD 220
 playerAngle REAL8 3.6
+playerBlood DWORD 100
+playerProtectedFrame DWORD 200
+playerPainCount DWORD 0
 speedX DWORD 0
 speedY DWORD 0
 .code
@@ -157,5 +161,86 @@ DrawPlayer PROC, hdc: HDC
 
   RET
 DrawPlayer ENDP
+
+checkAttack PROC
+	LOCAL temp:DWORD, deltaX: REAL8, deltaY: REAL8
+	mov esi, 0
+	.WHILE esi < NPCAliveNum
+		FINIT
+		FILD (NPC PTR NPCList[esi]).posX
+		FILD playerX
+		FSUB
+		FST deltaX
+		FILD (NPC PTR NPCList[esi]).posY
+		FILD playerY
+		FSUB
+		FST deltaY
+		FLD deltaX
+		FMUL deltaX
+		FLD deltaY
+		FMUL deltaY
+		FADD
+		FSQRT
+		mov temp, ATTACK_RADIUM
+		FILD temp
+		FCOM
+		FSTSW ax
+		SAHF
+		jc NO_ATTACKED
+		.IF playerBlood <= ATTACK_HURT
+			INVOKE PlayerDeathSound
+			INVOKE StopBGM
+			mov playerBlood, 0
+		.ELSE
+			.IF playerPainCount == 0
+				INVOKE PlayerPainSound
+				mov playerPainCount, 60
+				mov playerProtectedFrame, ATTACK_INTERVAL
+			.ENDIF
+			sub playerBlood, ATTACK_HURT
+		.ENDIF
+	NO_ATTACKED:
+		inc esi
+	.ENDW
+	RET
+checkAttack ENDP
+
+; 0 for dead, 1 for alive, 2 for protected-frame state, 3 for win 
+playerStateCheck PROC
+	; decrease playerPainCount so that pain sound can be played
+	.IF playerPainCount > 0
+		dec playerPainCount
+	.ENDIF
+
+	; dead check
+	mov eax, playerBlood
+	cmp eax, 0
+	je ExitPlayerStateCheck
+
+	; protected state check
+	.IF playerProtectedFrame > 0
+		dec playerProtectedFrame
+		mov eax, 2
+		jmp ExitPlayerStateCheck
+	.ENDIF
+
+	; win check
+	.IF NPCAliveNum == 0
+		mov eax, 3
+		jmp ExitPlayerStateCheck
+	.ENDIF
+
+	; be attacked check
+	invoke checkAttack
+
+	; dead check
+	mov eax, playerBlood
+	cmp eax, 0
+	je ExitPlayerStateCheck
+
+	mov eax, 1
+ExitPlayerStateCheck:
+	RET
+playerStateCheck ENDP
 
 END

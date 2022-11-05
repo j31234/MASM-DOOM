@@ -4,9 +4,12 @@
 from PIL import Image
 import numpy as np
 import glob
+import os
 
 blt_color = (255, 255, 255) # blt color: white
 png_list = glob.glob('input/*.png')
+if not os.path.isdir('output'):
+    os.mkdir('output')
 for png in png_list:
     img = Image.open(png)
     img = img.convert('RGBA')

@@ -3,6 +3,11 @@ SOUND_INC equ <1>
 
 include windows.inc
 
-ShotgunSound Proto
+PlayBGM          PROTO
+StopBGM          PROTO
+
+ShotgunSound     Proto
+PlayerPainSound  Proto
+PlayerDeathSound Proto
 
 ENDIF

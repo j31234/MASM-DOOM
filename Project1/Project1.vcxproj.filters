@@ -91,6 +91,45 @@
     <Image Include="res\caco_7.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\game_over.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_0.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_2.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_3.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_4.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_5.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_6.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_7.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_8.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_9.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\num_percent.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\win.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="main.asm">

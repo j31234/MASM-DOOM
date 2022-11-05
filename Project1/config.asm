@@ -16,5 +16,9 @@ weaponIDBList DWORD 131, 132, 133, 134, 135, 136
 hWeaponBitmapList DWORD 6 DUP(?)
 cacoIDBList DWORD 153, 154, 155, 156, 157, 158, 159, 160
 hCacoBitmapList DWORD 8 DUP(?)
+bloodIDBList DWORD 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172
+hBloodBitmapList DWORD 11 DUP(?)
+hEnd DWORD ?
+hWin DWORD ?
 
 END

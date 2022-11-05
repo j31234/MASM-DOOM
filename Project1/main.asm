@@ -4,13 +4,11 @@ OPTION  CaseMap:None
 
 ; MASM32 Headers
 include windows.inc
-include winmm.inc
 include user32.inc
 include kernel32.inc
 include gdi32.inc
 
 ; MASM32 Library
-includelib winmm.lib
 includelib user32.lib
 includelib kernel32.lib
 includelib gdi32.lib
@@ -19,8 +17,10 @@ includelib gdi32.lib
 include config.inc
 include map.inc
 include draw.inc
+include player.inc
+include sound.inc
 
-FUNCPROTO       TYPEDEF PROTO 
+FUNCPROTO       TYPEDEF PROTO
 FUNCPTR         TYPEDEF PTR FUNCPROTO
 
 ;==================== DATA =======================
@@ -52,7 +52,7 @@ WinMain PROC
 ; Load the program's icon and cursor.
 	IDI_ICON1 = 101
 	INVOKE LoadIcon, hInstance, IDI_ICON1
-	mov MainWin.hIcon, eax 
+	mov MainWin.hIcon, eax
 
 	IDB_TEXTURE1 = 103
 	INVOKE LoadBitmap, hInstance, IDB_TEXTURE1
@@ -92,6 +92,23 @@ WinMain PROC
 		inc ebx
 	.ENDW
 
+	; Load 11 blood for weapon animation
+	mov ebx, 0
+	.WHILE ebx < 11
+		mov eax, bloodIDBList[ebx * TYPE bloodIDBList]
+		INVOKE LoadBitmap, hInstance, eax
+		mov hBloodBitmapList[ebx * TYPE hBloodBitmapList], eax
+		inc ebx
+	.ENDW
+
+	IDB_END = 161
+	INVOKE LoadBitmap, hInstance, IDB_END
+	mov hEnd, eax
+
+	IDB_WIN = 173
+	INVOKE LoadBitmap, hInstance, IDB_WIN
+	mov hWin, eax
+
 	INVOKE LoadCursor, NULL, IDC_ARROW
 	mov MainWin.hCursor, eax
 
@@ -126,6 +143,9 @@ WinMain PROC
 ; Read map data from file
 	INVOKE InitMap
 
+; Start playing bgm
+	INVOKE PlayBGM
+
 ; Show and draw the window.
 	INVOKE ShowWindow, hMainWnd, SW_SHOW
 	INVOKE UpdateWindow, hMainWnd
@@ -136,9 +156,6 @@ WinMain PROC
 
 ; Frame timer
     INVOKE SetTimer, hMainWnd, NULL, DELTA_TIME, NULL
-
-; Play background music
-	INVOKE PlaySound, ADDR bgmName, NULL, SND_ASYNC OR SND_LOOP OR SND_FILENAME
 
 ; Begin the program's message-handling loop.
 Message_Loop:
@@ -188,7 +205,6 @@ COMMENT @
 	.IF eax == WM_TIMER
 	  ; Get HDC
 
-
 	  INVOKE GetDC, hMainWnd
 	  mov hdc, eax
 
@@ -218,6 +234,7 @@ COMMENT @
 	  ; Alt the true device context
 	  INVOKE BitBlt, hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memHdc, 0, 0, SRCCOPY
 
+ReleaseResources:
 	  ; Release Resources: double buffer, brush/pen, dc
 	  INVOKE DeleteObject, memBitmap
 	  INVOKE DeleteDC, memHdc

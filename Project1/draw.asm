@@ -50,7 +50,7 @@ DrawLine ENDP
 
 PushRenderList Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nHeight:DWORD,
 	SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, pic:DWORD, transparent:DWORD, dist:DWORD
-  mov edi, renderTail 
+  mov edi, renderTail
 
   mov eax, DestX
   mov (renderObject PTR renderList[edi]).destX, eax
@@ -81,8 +81,8 @@ PushRenderList Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD
 PushRenderList ENDP
 
 DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nHeight:DWORD,
-				 SrcX:DWORD, SrcY:DWORD, pic:DWORD, dist:DWORD
-	invoke PushRenderList, hdc, drawdc, DestX, DestY, nWidth, nHeight, SrcX, SrcY, nWidth, 256, pic, 0, dist
+				 SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, hpic:DWORD, dist:DWORD
+	invoke PushRenderList, hdc, drawdc, DestX, DestY, nWidth, nHeight, SrcX, SrcY, SrcWidth, SrcHeight, hpic, 0, dist
   RET
 DrawBitmap ENDP
 
@@ -98,7 +98,7 @@ DrawTransparentBitmap  Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, Dest
   RET
 DrawTransparentBitmap ENDP
 
-swap proc 
+swap proc
  pushad
  mov eax, esi
  mov edi, size renderObject
@@ -129,7 +129,7 @@ swap_loop:
  popad
  ret
 swap endp
- 
+
 quicksort proc
  mov eax, l
  cmp eax, r
@@ -138,29 +138,13 @@ quicksort proc
  xor ebx, ebx;
  mov esi, l ;i
  mov ebx, r ;j
- ;mov eax, dat[esi * type dat]
 
-
- ;xor edx, edx
- ;mov eax, esi
- ;mov esi, SIZE renderObject
-; mul esi
- ;mov esi, eax
  xor edx, edx
  mov eax, esi
  mov edi, SIZE renderObject
  mul edi
  mov edi, eax
  mov eax, (renderObject PTR renderList[edi]).dist
-
-
- ;xor edx, edx
-;mov eax, esi
-;mov esi, SIZE renderObject
-;div esi
-;mov esi, eax
-
-
 
 sort_again:
  cmp ebx,esi;    while (i!=j)
@@ -180,7 +164,7 @@ sort_again:
    cmp eax, (renderObject PTR renderList[edi]).dist
    jl loop_i_again
    add ebx, -1   ;  j--
-   jmp loop_j_again; 
+   jmp loop_j_again;
   loop_i_again:
    cmp esi, ebx;    while (i<j)
    jge over_loop
@@ -278,7 +262,7 @@ DrawBackground Proc, hdc:HDC, drawdc:HDC, SrcX:DWORD, SrcY:DWORD
   idiv ebx
   mov temp, edx
 
-  
+
   INVOKE SelectObject, drawdc, hBackground
   mov oldObject, eax
   INVOKE StretchBlt, hdc, temp, 0, BACKGOUND_WIDTH, BACKGOUND_HEIGHT, drawdc, SrcX, SrcY, BACKGOUND_WIDTH, BACKGOUND_HEIGHT, SRCCOPY
@@ -305,18 +289,87 @@ DrawFloor Proc, hdc:HDC
 DrawFloor ENDP
 
 DrawNPC Proc, hdc:HDC, drawdc:HDC
+	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDistInt:DWORD, delta:REAL8, normDist:REAL8
+	LOCAL npcID:DWORD
 	mov ecx, NPCNum
 NPC_LOOP:
 	mov eax, ecx
 	dec eax
 	mov ebx, SIZE NPC
 	mul ebx
-	pushad
-	INVOKE GetSprite, hdc, drawdc, (NPC PTR NPCList[eax]).posX, (NPC PTR NPCList[eax]).posY, eax
-	popad
+	mov edx, (NPC PTR NPCList[eax]).blood
+	.IF edx > 0
+		; Move NPC
+		pushad
+		mov npcID, eax
+		INVOKE MoveNPC, eax
+		popad
+		; Get NPC position
+		pushad
+		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, eax
+
+		mov esi, npcID
+		mov eax, (NPC PTR NPCList[esi]).nowIDB
+		; Draw NPC
+		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
+
+		popad
+	.ENDIF
 	loop NPC_LOOP
 	RET
 DrawNPC ENDP
+
+DrawEnd PROC,  hdc:HDC, drawdc:HDC
+	INVOKE DrawBitmap, hdc, drawdc, 0, 0, 800, 600, 50, 50, 1600, 800, hEnd, 0
+	RET
+DrawEnd ENDP
+
+DrawWin PROC,  hdc:HDC, drawdc:HDC
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, 800, 600, 50, 50, 1600, 800, hWin, 0
+	RET
+DrawWin ENDP
+
+DrawBlood PROC, hdc:HDC, drawdc:HDC
+	; hundred
+	xor edx, edx
+	mov eax, playerBlood
+	mov ebx, 100
+	div ebx
+	.IF eax == 1
+		mov esi, 1
+		mov esi, hBloodBitmapList[esi * TYPE hBloodBitmapList]
+		INVOKE DrawTransparentBitmap, hdc, drawdc, 10, 10, 64, 64, 0, 0, 64, 64, esi, 0
+	.ENDIF
+
+	; ten
+	xor edx, edx
+	mov eax, playerBlood
+	mov ebx, 10
+	div ebx
+	.IF eax == 0
+		jmp DRAW_SINGLE
+	.ELSEIF eax == 10
+		mov eax, 0
+	.ENDIF
+	mov esi, hBloodBitmapList[eax * TYPE hBloodBitmapList]
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 80, 10, 64, 64, 0, 0, 64, 64, esi, 0
+
+DRAW_SINGLE:
+	; single
+	xor edx, edx
+	mov eax, playerBlood
+	mov ebx, 10
+	div ebx
+	mov esi, hBloodBitmapList[edx * TYPE hBloodBitmapList]
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 150, 10, 64, 64, 0, 0, 64, 64, esi, 0
+
+	; percent
+	mov eax, 10
+	mov esi, hBloodBitmapList[eax * TYPE hBloodBitmapList]
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 220, 10, 64, 64, 0, 0, 64, 64, esi, 0
+
+	RET
+DrawBlood ENDP
 
 DrawMain Proc, hdc:HDC, drawdc:HDC
   pushad
@@ -324,22 +377,35 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
   mov renderHead, 0
   mov renderTail, 0
 
+  INVOKE playerStateCheck ; 0 for dead, 1 for alive, 2 for no-attracked state, 3 for win
+
+  ; dead
+  .IF eax == 0
+	INVOKE DrawEnd, hdc, drawdc
+	jmp StartRender
+  ; no-attracked
+  .ELSEIF eax == 3
+	INVOKE DrawWin, hdc, drawdc
+  .ENDIF
+
+
   ; INVOKE DrawMap, hdc
   INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
+  INVOKE DrawBlood, hdc, drawdc
   INVOKE DrawBackground, hdc, drawdc, 0, 0
   INVOKE DrawFloor, hdc
   INVOKE DrawNPC, hdc, drawdc
   INVOKE DrawWall, hdc, drawdc
-  
+
   ; Draw Weapon
   INVOKE DrawWeapon, hdc, drawdc
-  
-  
 
-  INVOKE Render, hdc, drawdc
-  
   ; Reset cursor position to the middle of the window
   INVOKE SetCursorPos, WINDOW_CENTER_X, WINDOW_CENTER_Y
+
+StartRender:
+  INVOKE Render, hdc, drawdc
+
 
   popad
   RET

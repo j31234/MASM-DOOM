@@ -635,12 +635,12 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
 
   mov ebx, textureType
   .IF ebx == 1
-	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture1, wallDistanceInt
+	INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, 1, 256, hTexture1, wallDistanceInt
   .ELSE 
 	.IF ebx == 2
-		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture2, wallDistanceInt
+		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, 1, 256, hTexture2, wallDistanceInt
 	.ELSE
-		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, hTexture3, wallDistanceInt
+		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, 1, 256, hTexture3, wallDistanceInt
 	.ENDIF
   .ENDIF
   
