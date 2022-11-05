@@ -311,7 +311,7 @@ NPC_LOOP:
 		mov esi, npcID
 		mov eax, (NPC PTR NPCList[esi]).nowIDB
 		; Draw NPC
-		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
+		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
 
 		popad
 	.ENDIF
