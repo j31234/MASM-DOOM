@@ -16,11 +16,10 @@ includelib masm32.lib
 soundFileName BYTE 100 dup(?)
 
 .code
-main:
-  INVOKE GetConsoleWindow
-  INVOKE ShowWindow, eax, SW_HIDE
+WinMain PROC
   INVOKE GetCL, 0, ADDR soundFileName
-  ;INVOKE StdOut, ADDR soundFileName
   INVOKE PlaySound, ADDR soundFileName, NULL, SND_SYNC OR SND_FILENAME
-  ret
-END main
+  INVOKE ExitProcess,0
+WinMain ENDP
+
+END WinMain
