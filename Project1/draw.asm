@@ -311,7 +311,7 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 		.IF ebx == 1
 			mov eax, hCacoAttack
 		.ENDIF
-		; if be attacked
+		; if being attacked
 		mov ebx, (NPC PTR NPCList[esi]).attackedFrame
 		.IF ebx == 0
 			nop
@@ -324,7 +324,6 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 		popad
 	; dead
 	.ELSE
-		mov esi, npcID
 		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, ADDR tempFloat, eax
 		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hCacoDeath, normDistInt
 	.ENDIF
@@ -338,9 +337,9 @@ NPC_LOOP:
 	dec eax
 	mov ebx, SIZE NPC
 	mul ebx
-		pushad
-		INVOKE DrawSingleNPC, hdc, drawdc, eax
-		popad
+	pushad
+	INVOKE DrawSingleNPC, hdc, drawdc, eax
+	popad
 	loop NPC_LOOP
 	RET
 DrawNPC ENDP
