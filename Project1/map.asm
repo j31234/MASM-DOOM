@@ -16,6 +16,7 @@ includelib msvcrt.lib
 
 ; Custom Header
 include draw.inc
+include sprite.inc
 include player.inc
 include config.inc
 
@@ -29,18 +30,15 @@ ROW DWORD ?
 COLUMN DWORD ?
 mapData BYTE 10000 DUP(?)
 mapFile BYTE "map.txt", 0
-mapFPTR DWORD ?
 filemode BYTE "r", 0
 inputStr BYTE "%d", 0
 
-XScale DWORD 80
-YScale DWORD 80
 eps REAL8 0.000001
 
 .code
 ; Read map data from file
 InitMap Proc
-    LOCAL CurRow:DWORD, CurCol:DWORD, MapPos:DWORD
+    LOCAL CurRow:DWORD, CurCol:DWORD, MapPos:PTR BYTE, mapFPTR:DWORD
 	mov CurRow, 0
   	INVOKE fopen, ADDR mapFile, ADDR filemode
 	mov mapFPTR, eax
@@ -55,6 +53,13 @@ InitMap Proc
 		add eax, OFFSET mapData
 		mov MapPos, eax
 		INVOKE fscanf, mapFPTR, ADDR inputStr, MapPos
+		mov eax, MapPos
+		mov al, [eax]
+		.IF al == 9
+			mov eax, MapPos
+			mov BYTE PTR [eax], 0
+			INVOKE CreateNPC, CurRow, CurCol
+		.ENDIF
 		inc CurCol
 		mov eax, COLUMN
         cmp CurCol, eax

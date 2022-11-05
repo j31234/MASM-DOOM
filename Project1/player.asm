@@ -31,6 +31,7 @@ playerProtectedFrame DWORD 200
 playerPainCount DWORD 0
 speedX DWORD 0
 speedY DWORD 0
+
 .code
 UpdatePlayerAngle PROC
   LOCAL cursorPos:POINT, dAngle: DWORD, temp:SDWORD

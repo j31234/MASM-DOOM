@@ -25,11 +25,9 @@ include sound.inc
 include queue.inc
 
 .data
-
-NPCList NPC  <600,210,,100,0,0>, <250,800,,100,0,0> ;TODO: init NPC position
-NPCNum DWORD 2
-NPCAliveNum DWORD 2
-
+NPCList NPC 100 DUP(<,,,,,>) ;<600,210,,100,0,0>, <250,800,,100,0,0>
+NPCNum DWORD 0
+NPCAliveNum DWORD 0
 
 IMAGE_WIDTH DWORD 126
 IMAGE_HALF_WIDTH DWORD 63
@@ -53,6 +51,32 @@ BFSPreNode_SIZE = 128 * 128
 BFSPreNode POINT BFSPreNode_SIZE DUP(<?,?>) ; 1024 * 1024, for fast index
 
 .code
+CreateNPC PROC, currow:DWORD, curcol:DWORD
+	local npcindex:DWORD
+	
+	mov eax, NPCNum
+	mov ebx, SIZE NPC
+	mul ebx
+	mov npcindex, eax
+	
+	mov eax, currow
+	mov ebx, XScale
+	mul ebx
+	mov ebx, eax
+	mov eax, npcindex
+	mov (NPC PTR NPCList[eax]).posX, ebx
+	
+	mov eax, curcol
+	mov ebx, YScale
+	mul ebx
+	mov ebx, eax
+	mov eax, npcindex
+	mov (NPC PTR NPCList[eax]).posY, ebx
+
+	inc NPCNum
+	inc NPCAliveNum
+	RET
+CreateNPC ENDP
 
 AngleClip PROC, angle:REAL8, ptrClipedAngle:DWORD
 ; Clip angle to [0, 2pi]
