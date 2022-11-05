@@ -297,7 +297,7 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 		; Move NPC
 		pushad
 		mov npcID, eax
-		INVOKE MoveNPC, eax
+		INVOKE MoveNPC, npcID
 		popad
 		; Get NPC position
 		pushad

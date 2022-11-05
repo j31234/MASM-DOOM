@@ -23,8 +23,8 @@ include sprite.inc
 include sound.inc
 
 .data
-playerX DWORD 150
-playerY DWORD 220
+playerX DWORD 100
+playerY DWORD 100
 playerAngle REAL8 3.6
 playerBlood DWORD 100
 playerProtectedFrame DWORD 200

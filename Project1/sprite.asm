@@ -37,7 +37,7 @@ IMAGE_RATIO REAL8 0.9545f
 SPRITE_SCALE REAL8 60.0f
 SPRITE_HEIGHT_SHIFT REAL8 0.20f
 
-NPC_MOVE_STEP = 1
+NPC_MOVE_STEP = 3
 NPC_BOX_SIZE = 30
 
 ; 4 Direction Move
@@ -187,6 +187,7 @@ MoveNPC PROC, npcID:DWORD
   LOCAL npcBlockX:DWORD, npcBlockY:DWORD, playerBlockX:DWORD, playerBlockY:DWORD
   LOCAL npcDx:DWORD, npcDy:DWORD, signedZero:SDWORD
   LOCAL npcAngle:DWORD
+  LOCAL tmp:DWORD
 
   mov signedZero, 0
 
@@ -340,12 +341,16 @@ TRACEBACK_START:
 
 TRACEBACK_END:
   ; calc npcDx, npcDy
-  mov eax, playerBlockX
+  mov eax, nowX
   sub eax, npcBlockX
+  mov ebx, NPC_MOVE_STEP
+  mul ebx
   mov npcDx, eax
 
-  mov eax, playerBlockY
+  mov eax, nowY
   sub eax, npcBlockY
+  mov ebx, NPC_MOVE_STEP
+  mul ebx
   mov npcDy, eax
 
 UPDATE_NPC_POSITION:
