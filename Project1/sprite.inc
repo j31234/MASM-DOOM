@@ -6,6 +6,7 @@ include windows.inc
 NPC STRUCT
 	posX DWORD ?
 	posY DWORD ?
+	nowIDB DWORD ?
 NPC ENDS
 
 EXTERNDEF NPCList: NPC

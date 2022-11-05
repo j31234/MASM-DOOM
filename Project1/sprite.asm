@@ -51,12 +51,116 @@ BFSPreNode_SIZE = 128 * 128
 BFSPreNode POINT BFSPreNode_SIZE DUP(<?,?>) ; 1024 * 1024, for fast index
 
 .code
+
+AngleClip PROC, angle:REAL8, ptrClipedAngle:DWORD
+; Clip angle to [0, 2pi]
+; Result passed by ptrClipedAngle
+  LOCAL temp:DWORD
+  angleGreater2Pi:
+	 FINIT
+	 FLD angle
+	 FLDPI
+	 mov temp, 2
+	 FIMUL temp
+	 FCOM
+	 FSTSW ax
+	 SAHF
+	 jnc angleLess2Pi
+	 FSUB
+	 FST angle
+	 jmp angleGreater2Pi
+angleLess2Pi:
+	 NOP
+angleLess0:
+	 FINIT
+	 FLD angle
+	 mov temp, 0
+	 FILD temp
+	 FCHS
+	 FCOM
+	 FSTSW ax
+	 SAHF
+	 jc angleGreater0
+	 FINIT
+	 FLD angle
+	 FLDPI
+	 mov temp, 2
+	 FIMUL temp
+	 FADD
+	 FST angle
+	 jmp angleLess0
+angleGreater0:
+	 
+	 mov esi, ptrClipedAngle
+	 FINIT
+	 FLD angle
+	 FST REAL8 PTR [esi]
+	 RET
+AngleClip ENDP
+
+UpdateNPCAnimation PROC, npcID:DWORD, npcDx:DWORD, npcDy:DWORD
+  LOCAL npcAngle:REAL8, angleDelta:REAL8, angleDeltaClipped:REAL8
+  LOCAL minAngle:REAL8, minIndex:DWORD, tmp:DWORD
+
+  ; npcAngle = atan(npcDy / npcDx)
+  FINIT
+  FILD npcDy
+  FILD npcDx
+  FPATAN
+  FST npcAngle
+
+  ; angleDelta = pi + (npcAngle - playerAngle)
+  FINIT
+  FLDPI
+  FADD npcAngle
+  FSUB playerAngle
+  FST angleDelta
+
+  INVOKE AngleClip, angleDelta, ADDR angleDeltaClipped
+
+  FINIT
+  FLDPI
+  FST minAngle
+  ; get argmin(abs(i*pi/4 - angleDeltaClipped))
+  mov ecx, 0
+  .WHILE ecx < 8
+    FINIT
+	FLDPI
+	mov tmp, 4
+	FIDIV tmp
+	mov tmp, ecx
+	FIMUL tmp
+
+	FSUB angleDeltaClipped
+	FABS
+
+	FCOM minAngle
+	FNSTSW ax
+	sahf
+	jnb UPDATE_END
+
+	FST minAngle
+	mov minIndex, ecx
+
+  UPDATE_END:
+    inc ecx
+  .ENDW
+
+  mov esi, minIndex
+  mov eax, hCacoBitmapList[esi * 4]
+  mov esi, npcID
+  mov (NPC PTR NPCList[esi]).nowIDB, eax 
+  
+  RET
+UpdateNPCAnimation ENDP
+
 MoveNPC PROC, npcID:DWORD
   ; Move NPC towards player.
   ; BFS to get to the shortest path. 
   LOCAL npcX:DWORD, npcY:DWORD, nowX:DWORD, nowY:DWORD, nextX:DWORD, nextY:DWORD
   LOCAL npcBlockX:DWORD, npcBlockY:DWORD, playerBlockX:DWORD, playerBlockY:DWORD
   LOCAL npcDx:DWORD, npcDy:DWORD, signedZero:SDWORD
+  LOCAL npcAngle:DWORD
 
   mov signedZero, 0
 
@@ -219,6 +323,7 @@ TRACEBACK_END:
   mov npcDy, eax
 
 UPDATE_NPC_POSITION:
+  INVOKE UpdateNPCAnimation, npcID, npcDx, npcDy
   ; if npc is too close to player, stop moving
   mov eax, playerX
   sub eax, npcX
@@ -254,6 +359,10 @@ GetSprite PROC, hdc:HDC, drawdc:HDC, x:DWORD, y:DWORD, npcID:DWORD
 	LOCAL HalfFOVAngle:REAL8, screenDistance:REAL8
 	LOCAL proj:REAL8, projWidth:DWORD, projHeight:DWORD
 	LOCAL posX: DWORD, posY: DWORD, tempPlayerAngle:REAL8
+	; Default Animation
+	mov esi, npcID
+	mov (NPC PTR NPCList[esi]).nowIDB, 0 
+
 	; Move NPC
 	INVOKE MoveNPC, npcID
 
@@ -470,7 +579,9 @@ finishAddDelta:
 	FIMUL temp
 	FIST normDistInt
 	
-	INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hNPC1, normDistInt
+	mov esi, npcID
+	mov eax, (NPC PTR NPCList[esi]).nowIDB 
+	INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
 exit_get_sprite:
 	RET
 GetSprite ENDP

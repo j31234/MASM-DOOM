@@ -29,7 +29,7 @@ speedX DWORD 0
 speedY DWORD 0
 .code
 UpdatePlayerAngle PROC
-  LOCAL cursorPos:POINT, dAngle: DWORD
+  LOCAL cursorPos:POINT, dAngle: DWORD, temp:SDWORD
   INVOKE GetCursorPos, ADDR cursorPos
 
   ; calc delta angle
@@ -45,6 +45,7 @@ UpdatePlayerAngle PROC
   FMUL
   FADD
   FST playerAngle
+
   RET
 UpdatePlayerAngle ENDP
 

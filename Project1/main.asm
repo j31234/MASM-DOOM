@@ -74,12 +74,21 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_NPC1
 	mov hNPC1, eax
 
-	; Load 6 bitmap for weapon animation
+	; Load 6 bitmaps for weapon animation
 	mov ebx, 0
 	.WHILE ebx < 6
 		mov eax, weaponIDBList[ebx * TYPE weaponIDBList]
 		INVOKE LoadBitmap, hInstance, eax
 		mov hWeaponBitmapList[ebx * TYPE hWeaponBitmapList], eax
+		inc ebx
+	.ENDW
+
+	; Load 8 bitmaps for caco animation
+	mov ebx, 0
+	.WHILE ebx < 8
+		mov eax, cacoIDBList[ebx * TYPE cacoIDBList]
+		INVOKE LoadBitmap, hInstance, eax
+		mov hCacoBitmapList[ebx * TYPE hCacoBitmapList], eax
 		inc ebx
 	.ENDW
 

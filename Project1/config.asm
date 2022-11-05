@@ -14,5 +14,7 @@ hBackground DWORD ?
 hNPC1 DWORD ?
 weaponIDBList DWORD 131, 132, 133, 134, 135, 136
 hWeaponBitmapList DWORD 6 DUP(?)
+cacoIDBList DWORD 153, 154, 155, 156, 157, 158, 159, 160
+hCacoBitmapList DWORD 8 DUP(?)
 
 END
