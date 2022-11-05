@@ -363,6 +363,9 @@ NPCDamage PROC damage:DWORD, npcID:DWORD
 	mul ebx
 	mov npcindex, eax
 	mov eax, (NPC PTR NPCList[eax]).blood
+	.IF eax == 0
+		jmp DEAD_BODY
+	.ENDIF
 
 	; bullet collision check
 	pushad
@@ -395,14 +398,10 @@ NPCDamage PROC damage:DWORD, npcID:DWORD
 
 	mov eax, npcindex
 	mov eax, (NPC PTR NPCList[eax]).blood
-	.IF eax == 0
-		nop
-	.ELSEIF eax <= damage
+	.IF eax <= damage
 		mov eax, npcindex
 		mov (NPC PTR NPCList[eax]).blood, 0
-		mov edi, NPCAliveNum
-		dec edi
-		mov NPCAliveNum, edi
+		dec NPCAliveNum
 		mov eax, 2
 	.ELSE
 		mov ebx, damage
@@ -412,7 +411,10 @@ NPCDamage PROC damage:DWORD, npcID:DWORD
 	.ENDIF
 	mov edi, npcindex
 	mov (NPC PTR NPCList[edi]).attackedFrame, 20
+	RET
 BULLET_MISS:
+	mov eax, 0
+DEAD_BODY:
 	RET
 NPCDamage ENDP
 

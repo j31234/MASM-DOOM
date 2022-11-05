@@ -167,6 +167,10 @@ checkAttack PROC
 	mov esi, 0
 	mov edi, 0
 	.WHILE edi < NPCNum
+		mov eax, (NPC PTR NPCList[esi]).blood
+		.IF eax == 0
+			jmp NEXT_CHECK_ATTACK
+		.ENDIF
 		FINIT
 		FILD (NPC PTR NPCList[esi]).posX
 		FILD playerX
