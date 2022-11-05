@@ -275,7 +275,7 @@ RayCasting PROC, angle:REAL8, pWallX:PTR DWORD, pWallY:PTR DWORD, pWallDistance:
   FSIN
   FST angleSin
 
-  ;;;;;;;;;; horizontal
+; horizontal
 
   ; 查看sin的正负
   FINIT
@@ -368,7 +368,7 @@ SIN_EXIT:
   ;jne LOOP_COLUMN ; jump if no walls
 
 
-;;;;;;;;;;;;;; vertical
+; vertical
   FINIT
   FLD angleCos
   FTST 
@@ -569,7 +569,7 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
 		param1:DWORD, param2:DWORD, tempcolor:BYTE, tempoffset:DWORD, wallDistanceInt:DWORD, temp :DWORD
   ; screenHeight = wallHeight * (screenDistance / wallDistance)
   ; use XScale = wallHeight
-
+  pushad
   FINIT 
   FILD XScale
   FLD screenDistance
@@ -648,7 +648,7 @@ DrawWallColumn PROC, hdc:HDC, drawdc:HDC, screenX:DWORD, screenDistance:REAL8, w
 		INVOKE DrawBitmap, hdc, drawdc, screenX, columnBegin, 1, eax, tempoffset, 0, 1, 256, hTexture3, wallDistanceInt
 	.ENDIF
   .ENDIF
-  
+  popad
   RET
 DrawWallColumn ENDP
 
@@ -657,7 +657,7 @@ DrawWall PROC, hdc:HDC, drawdc:HDC
   LOCAL tmp:DWORD, angle:REAL8, angleScreenDistance:REAL8
   LOCAL wallX:DWORD, wallY:DWORD, wallDistance:REAL8, textureOffset:REAL8
   LOCAL textureType:DWORD
-
+  pushad
   ; FOVAngle = FOV * pi / 180
   FINIT
   mov tmp, FOV
@@ -746,7 +746,7 @@ LOOP_ANGLE: ;  for ray in range(NUM_RAYS):
   test ecx, ecx
   jne LOOP_ANGLE
   ; LOOP LOOP_ANGLE
-
+  popad
   RET
 DrawWall ENDP
 

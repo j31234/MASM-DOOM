@@ -30,8 +30,8 @@ frameCount DWORD 0
 .code
 OnWeaponFired Proc
   LOCAL soundType:DWORD
+  pushad
   mov soundType, 0
-  ; TODO: Bullet Collision Detection
   INVOKE ShotgunSound
   mov esi, 0
   .WHILE esi < NPCNum
@@ -48,6 +48,7 @@ OnWeaponFired Proc
   .ELSEIF soundType == 2
     INVOKE NPCDeathSound
   .ENDIF
+  popad
   RET
 OnWeaponFired ENDP
 

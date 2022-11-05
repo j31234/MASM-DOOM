@@ -165,6 +165,7 @@ DrawPlayer ENDP
 
 checkAttack PROC
 	LOCAL temp:DWORD, deltaX: REAL8, deltaY: REAL8
+	pushad
 	mov esi, 0
 	mov edi, 0
 	.WHILE edi < NPCNum
@@ -221,10 +222,12 @@ checkAttack PROC
 		inc edi
 	.ENDW
 	RET
+	popad
 checkAttack ENDP
 
 ; 0 for dead, 1 for alive, 2 for protected-frame state, 3 for win 
 playerStateCheck PROC
+
 	; decrease playerPainCount so that pain sound can be played
 	.IF playerPainCount > 0
 		dec playerPainCount

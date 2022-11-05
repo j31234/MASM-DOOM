@@ -37,43 +37,59 @@ npcatkName   BYTE "npc_attack.wav", 0
 .code
 PlayBGM PROC
   ; Play background music
+  pushad
   INVOKE PlaySound, ADDR bgmName, NULL, SND_ASYNC OR SND_LOOP OR SND_FILENAME
+  popad
   RET
 PlayBGM ENDP
 
 StopBGM PROC
   ; Stop background music
+  pushad
   INVOKE PlaySound, NULL, NULL, SND_ASYNC OR SND_LOOP OR SND_FILENAME
+  popad
   RET
 StopBGM ENDP
 
 ShotgunSound PROC
+  pushad
   INVOKE CreateProcess, ADDR processName, ADDR shotgunName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  popad
   RET
 ShotgunSound ENDP
 
 PlayerPainSound PROC
+  pushad
   INVOKE CreateProcess, ADDR processName, ADDR plpainName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  popad
   RET
 PlayerPainSound ENDP
 
 PlayerDeathSound PROC
+  pushad
   INVOKE CreateProcess, ADDR processName, ADDR pldeathName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  popad
   RET
 PlayerDeathSound ENDP
 
 NPCPainSound PROC
+  pushad
   INVOKE CreateProcess, ADDR processName, ADDR npcpainName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  popad
   RET
 NPCPainSound ENDP
 
 NPCDeathSound PROC
-  INVOKE CreateProcess, ADDR processName, ADDR npcdeathName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  pushad
+  INVOKE CreateProcess, ADDR processName, ADDR npcdeathName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO  
+  popad
   RET
 NPCDeathSound ENDP
 
 NPCATKSound PROC
-  INVOKE CreateProcess, ADDR processName, ADDR npcatkName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO
+  pushad
+  INVOKE CreateProcess, ADDR processName, ADDR npcatkName, NULL, NULL, FALSE, 0, NULL, NULL, ADDR SUINFO, ADDR PRCINFO  
+  popad
   RET
 NPCATKSound ENDP
 

@@ -95,6 +95,22 @@ WinMain PROC
 	INVOKE LoadBitmap, hInstance, IDB_NPC1_HURT
 	mov hCacoHurt, eax
 
+	IDB_NPC2 = 178
+	INVOKE LoadBitmap, hInstance, IDB_NPC1
+	mov hNPC2, eax
+
+	IDB_NPC2_ATTACK = 188
+	INVOKE LoadBitmap, hInstance, IDB_NPC2_ATTACK
+	mov hCocoAttack, eax
+
+	IDB_NPC2_DEATH = 189
+	INVOKE LoadBitmap, hInstance, IDB_NPC2_DEATH
+	mov hCocoDeath, eax
+
+	IDB_NPC2_HURT = 190
+	INVOKE LoadBitmap, hInstance, IDB_NPC2_HURT
+	mov hCocoHurt, eax
+
 	; Load 6 bitmaps for weapon animation
 	mov ebx, 0
 	.WHILE ebx < 6
@@ -110,6 +126,15 @@ WinMain PROC
 		mov eax, cacoIDBList[ebx * TYPE cacoIDBList]
 		INVOKE LoadBitmap, hInstance, eax
 		mov hCacoBitmapList[ebx * TYPE hCacoBitmapList], eax
+		inc ebx
+	.ENDW
+
+	; Load 8 bitmaps for coco animation
+	mov ebx, 0
+	.WHILE ebx < 8
+		mov eax, cocoIDBList[ebx * TYPE cocoIDBList]
+		INVOKE LoadBitmap, hInstance, eax
+		mov hCocoBitmapList[ebx * TYPE hCocoBitmapList], eax
 		inc ebx
 	.ENDW
 
@@ -254,9 +279,9 @@ COMMENT @
 	  .IF gameState == 0
 		; Draw Main
 		INVOKE DrawMain, memHdc, drawHdc
+		; Index
 	  .ELSE
-	  	
-		; every 10 frame change the index1 <-> index2
+		; every 10 frames change the index1 <-> index2
 		xor edx, edx
 	    mov eax, gameState
 		mov ebx, 10
@@ -274,7 +299,6 @@ COMMENT @
 		.ENDIF
 		add gameState, 1
 		INVOKE StretchBlt, memHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, drawHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SRCCOPY
-
 		INVOKE SelectObject, drawHdc, oldObject
 	  .ENDIF
 	  

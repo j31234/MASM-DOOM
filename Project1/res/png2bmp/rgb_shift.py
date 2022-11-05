@@ -8,7 +8,8 @@ import os
 
 blt_color = (255, 255, 255) # blt color: white
 png_list = glob.glob('input/*.bmp')
-
+if not os.path.isdir('output'):
+    os.mkdir('output')
 for shift_times, color in enumerate(['red', 'green', 'blue']):
     if not os.path.isdir(color):
         os.mkdir(color)

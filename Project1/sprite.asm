@@ -25,7 +25,7 @@ include sound.inc
 include queue.inc
 
 .data
-NPCList NPC 100 DUP(<,,,,,>) ;<600,210,,100,0,0>, <250,800,,100,0,0>
+NPCList NPC 100 DUP(<,,,,,,>) ;<600,210,,100,0,0>, <250,800,,100,0,0>
 NPCNum DWORD 0
 NPCAliveNum DWORD 0
 
@@ -82,6 +82,7 @@ AngleClip PROC, angle:REAL8, ptrClipedAngle:DWORD
 ; Clip angle to [0, 2pi]
 ; Result passed by ptrClipedAngle
   LOCAL temp:DWORD
+  pushad
   angleGreater2Pi:
 	 FINIT
 	 FLD angle
@@ -121,13 +122,14 @@ angleGreater0:
 	 FINIT
 	 FLD angle
 	 FST REAL8 PTR [esi]
+	 popad
 	 RET
 AngleClip ENDP
 
-UpdateNPCAnimation PROC, npcID:DWORD, npcDx:DWORD, npcDy:DWORD
+UpdateNPCAnimation PROC, npcID:DWORD, npcDx:DWORD, npcDy:DWORD, npcType:DWORD
   LOCAL npcAngle:REAL8, angleDelta:REAL8, angleDeltaClipped:REAL8
   LOCAL minAngle:REAL8, minIndex:DWORD, tmp:DWORD
-
+  pushad
   ; npcAngle = atan(npcDy / npcDx)
   FINIT
   FILD npcDy
@@ -173,10 +175,15 @@ UpdateNPCAnimation PROC, npcID:DWORD, npcDx:DWORD, npcDy:DWORD
   .ENDW
 
   mov esi, minIndex
-  mov eax, hCacoBitmapList[esi * 4]
+  .IF npcType == 0
+	mov eax, hCacoBitmapList[esi * 4]
+  .ELSE
+    mov eax, hCocoBitmapList[esi * 4]
+  .ENDIF
   mov esi, npcID
-  mov (NPC PTR NPCList[esi]).nowIDB, eax
 
+  mov (NPC PTR NPCList[esi]).nowIDB, eax
+  popad
   RET
 UpdateNPCAnimation ENDP
 
@@ -186,9 +193,9 @@ MoveNPC PROC, npcID:DWORD
   LOCAL npcX:DWORD, npcY:DWORD, nowX:DWORD, nowY:DWORD, nextX:DWORD, nextY:DWORD
   LOCAL npcBlockX:DWORD, npcBlockY:DWORD, playerBlockX:DWORD, playerBlockY:DWORD
   LOCAL npcDx:DWORD, npcDy:DWORD, signedZero:SDWORD
-  LOCAL npcAngle:DWORD
+  LOCAL npcAngle:DWORD, npcType:DWORD
   LOCAL tmp:DWORD
-
+  pushad
   mov signedZero, 0
 
   ; Get npcX, npcY
@@ -197,6 +204,8 @@ MoveNPC PROC, npcID:DWORD
   mov npcX, eax
   mov eax, (NPC PTR NPCList[esi]).posY
   mov npcY, eax
+  mov eax, (NPC PTR NPCList[esi]).NPCType
+  mov npcType, eax
 
   ; Get Block ID for npc and player
   INVOKE GetBlockID, npcX, npcY, ADDR npcBlockX, ADDR npcBlockY
@@ -354,7 +363,7 @@ TRACEBACK_END:
   mov npcDy, eax
 
 UPDATE_NPC_POSITION:
-  INVOKE UpdateNPCAnimation, npcID, npcDx, npcDy
+  INVOKE UpdateNPCAnimation, npcID, npcDx, npcDy, npcType
   ; if npc is too close to player, stop moving
   mov eax, playerX
   sub eax, npcX
@@ -378,7 +387,7 @@ UPDATE_NPC_POSITION:
   add eax, npcDy
   mov esi, npcID
   mov (NPC PTR NPCList[esi]).posY, eax
-
+  popad
   RET
 MoveNPC ENDP
 
@@ -387,6 +396,7 @@ NPCDamage PROC damage:DWORD, npcID:DWORD
 	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDist:REAL8, normDistInt:DWORD, delta_res:REAL8, spriteDist:REAL8
 	LOCAL pWallX:DWORD, pWallY:DWORD, pWallDistance:REAL8, pOffset:REAL8, pTextureType:DWORD
 	local npcindex:DWORD
+	pushad
 	mov eax, npcID
 	mov ebx, SIZE NPC
 	mul ebx
@@ -425,24 +435,27 @@ NPCDamage PROC damage:DWORD, npcID:DWORD
 	SAHF
 	jnc BULLET_MISS
 
+	popad
 	mov eax, npcindex
 	mov eax, (NPC PTR NPCList[eax]).blood
 	.IF eax <= damage
 		mov eax, npcindex
 		mov (NPC PTR NPCList[eax]).blood, 0
+		mov (NPC PTR NPCList[eax]).attackedFrame, 40
 		dec NPCAliveNum
 		mov eax, 2
 	.ELSE
 		mov ebx, damage
 		mov eax, npcindex
 		sub (NPC PTR NPCList[eax]).blood, ebx
+		mov (NPC PTR NPCList[eax]).attackedFrame, 20
 		mov eax, 1
 	.ENDIF
-	mov edi, npcindex
-	mov (NPC PTR NPCList[edi]).attackedFrame, 20
+	
 	RET
 BULLET_MISS:
 	mov eax, 0
+	RET
 DEAD_BODY:
 	RET
 NPCDamage ENDP
@@ -456,15 +469,15 @@ GetSprite PROC posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:P
 	LOCAL proj:REAL8
 	LOCAL tempPlayerAngle:REAL8
 	LOCAL x:DWORD, y:DWORD
-
+	pushad
 
 	mov eax, npcID
-	mov eax, (NPC PTR NPCList[eax]).posX
-	mov x, eax
+	mov ebx, (NPC PTR NPCList[eax]).posX
+	mov x, ebx
 	
 	mov eax, npcID
-	mov eax, (NPC PTR NPCList[eax]).posY
-	mov y, eax
+	mov ebx, (NPC PTR NPCList[eax]).posY
+	mov y, ebx
 
 	mov eax, x
 	sub eax, playerX
@@ -696,6 +709,7 @@ exit_get_sprite:
 	FLD dist
 	mov esi, dist_res
 	FST REAL8 PTR [esi]
+	popad
 	RET
 GetSprite ENDP
 END

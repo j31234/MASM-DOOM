@@ -82,19 +82,25 @@ PushRenderList ENDP
 
 DrawBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, nWidth:DWORD, nHeight:DWORD,
 				 SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, hpic:DWORD, dist:DWORD
+	pushad
 	invoke PushRenderList, hdc, drawdc, DestX, DestY, nWidth, nHeight, SrcX, SrcY, SrcWidth, SrcHeight, hpic, 0, dist
+	popad
   RET
 DrawBitmap ENDP
 
 DrawNPCBitmap Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, projWidth:DWORD, projHeight:DWORD, pic:DWORD, dist:DWORD
 	LOCAL oldObject:HGDIOBJ, color:DWORD
+  pushad
   INVOKE PushRenderList, hdc,drawdc, DestX, DestY, projWidth, projHeight, 0, 0, 126, 132, pic, 1, dist
+  popad
   RET
 DrawNPCBitmap ENDP
 
 DrawTransparentBitmap  Proc, hdc:HDC, drawdc:HDC, DestX:DWORD, DestY:DWORD, DestWidth:DWORD, DestHeight:DWORD,
 	SrcX:DWORD, SrcY:DWORD, SrcWidth:DWORD, SrcHeight:DWORD, hBitmap:DWORD, distance:DWORD
+  pushad
   INVOKE PushRenderList, hdc,drawdc, DestX, DestY, DestWidth, DestHeight, SrcX, SrcY, SrcWidth, SrcHeight, hBitmap, 1, distance
+  popad
   RET
 DrawTransparentBitmap ENDP
 
@@ -223,6 +229,7 @@ Render Proc, hdc:HDC, drawdc:HDC
 	.WHILE esi < renderTail
 		INVOKE SelectObject, drawdc, (renderObject PTR renderList[esi]).hPic
 		mov eax, (renderObject PTR renderList[esi]).transparent
+		pushad
 		.IF eax == 0
 			INVOKE StretchBlt, hdc, (renderObject PTR renderList[esi]).destX, (renderObject PTR renderList[esi]).destY,
 				(renderObject PTR renderList[esi]).destWidth, (renderObject PTR renderList[esi]).destHeight, drawdc,
@@ -236,6 +243,7 @@ Render Proc, hdc:HDC, drawdc:HDC
 				(renderObject PTR renderList[esi]).srcX, (renderObject PTR renderList[esi]).srcY,
 				(renderObject PTR renderList[esi]).srcWidth, (renderObject PTR renderList[esi]).srcHeight, eax
 		.ENDIF
+		popad
 		add esi, TYPE renderObject
 	.ENDW
 	INVOKE SelectObject, drawdc, oldObject
@@ -290,26 +298,41 @@ DrawFloor ENDP
 
 DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 	LOCAL posX:DWORD, posY:DWORD, projWidth:DWORD, projHeight:DWORD, normDistInt:DWORD, delta:REAL8, normDist:REAL8, tempFloat:REAL8
+	LOCAL NPCType:DWORD, npcBlood:DWORD
+	mov projWidth, 0
+	mov projHeight, 0
+	mov posX, 0
+	mov posY, 0
 	mov eax, npcID
 	mov edx, (NPC PTR NPCList[eax]).blood
+
+	mov npcBlood, edx
+	mov ebx, (NPC PTR NPCList[eax]).NPCType
+	mov NPCType, ebx 
 	; alive
 	.IF edx > 0
 		; Move NPC
 		pushad
-		mov npcID, eax
 		INVOKE MoveNPC, npcID
 		popad
 		; Get NPC position
 		pushad
-		mov esi, npcID
-		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, ADDR tempFloat, eax
+
+		pushad
+		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, ADDR tempFloat, npcID
+		popad
+
 		mov esi, npcID
 		mov eax, (NPC PTR NPCList[esi]).nowIDB
 		; Draw NPC
 		; if attacking player
 		mov ebx, (NPC PTR NPCList[esi]).attacking
 		.IF ebx == 1
-			mov eax, hCacoAttack
+			.IF NPCType == 0
+				mov eax, hCacoAttack
+			.ELSE
+				mov eax, hCocoAttack
+			.ENDIF
 		.ENDIF
 		; if being attacked
 		mov ebx, (NPC PTR NPCList[esi]).attackedFrame
@@ -318,14 +341,26 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 		.ELSE
 			dec ebx
 			mov (NPC PTR NPCList[esi]).attackedFrame, ebx
-			mov eax, hCacoHurt
+			.IF NPCType == 0
+				mov eax, hCacoHurt
+			.ELSE
+				mov eax, hCocoHurt
+			.ENDIF
 		.ENDIF
 		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
 		popad
 	; dead
 	.ELSE
+		pushad
 		INVOKE GetSprite, ADDR posX, ADDR posY, ADDR projWidth, ADDR projHeight, ADDR normDist, ADDR normDistInt, ADDR delta, ADDR tempFloat, eax
-		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, hCacoDeath, normDistInt
+		
+		.IF NPCType == 0
+			mov eax, hCacoDeath
+		.ELSE
+			mov eax, hCocoDeath
+		.ENDIF
+		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
+		popad
 	.ENDIF
 	RET
 DrawSingleNPC ENDP

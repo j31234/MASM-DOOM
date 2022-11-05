@@ -7,9 +7,10 @@ NPC STRUCT
 	posX DWORD ?
 	posY DWORD ?
 	nowIDB DWORD ?
-	blood DWORD 100
+	blood DWORD 10
 	attacking DWORD 0
 	attackedFrame DWORD 0
+	NPCType DWORD 1
 NPC ENDS
 
 EXTERNDEF NPCList: NPC
