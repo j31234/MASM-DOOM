@@ -1,18 +1,23 @@
-### TODO
+# DOOM in MASM
 
-- [x] 添加音效（dwc）
-  - [x] 武器开火
-  - [x] 怪物受击/死亡
-  - [x] 玩家受击
-- [x] 怪物
-  - [x] 寻路算法：简单的搜索算法应该就够用了（如果接触（有一个小半径），不采取搜索给出的行动）（hjx）
-  - [x] 怪物血量：与武器子弹的正确碰撞（墙/其它怪物遮挡），命中判定（dwc）
-  - [x] 玩家血量：接触（有一个小半径）扣血（但是有无敌帧） / 更多？（xhb）
-  - [x] 根据怪物的速度向量与玩家朝向的夹角，显示不同的动画（hjx）
-  - [x] 更多怪物（xhb）
-  - [x] Game Over 和游戏开始标题（xhb）
-  - [ ] 【不做了】怪物碰撞箱（与墙/其它怪物）
-- [x] 地图
-  - [x] 从文件读取地形及怪物，且支持非硬编码大小的地图（dwc）
-  - [x] 多张地图
-- [x] 说明文档（hjx）
+用 Microsoft Assembly 实现一个类似于 DOOM 1993 的第一人称 3D 射击游戏。
+
+![](doc/img/game_demo.png)
+
+### 编译/运行
+
+直接在 Windows 下运行`exe/doom.exe`
+
+或者用 Visual Studio 2012/2022 打开项目，点击”生成解决方案“后，将`utils/`下的所有文件复制粘贴到`Debug/`文件夹下，然后直接在文件夹中双击运行`Project1.exe`即可。
+
+> 若要使用Visual Studio 2012/2022 中的”启动调试“或”开始执行(不调试)“功能，请将`utils/`下的所有文件复制粘贴到`Project1/`文件夹下。
+
+### 参考资料
+
+[Get Started with Win32 and C++ - Win32 apps | Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/learnwin32/learn-to-program-for-windows)
+
+[Programming reference for the Win32 API - Win32 apps | Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/api/)
+
+[Ray-Casting Tutorial – permadi.com](https://permadi.com/1996/05/ray-casting-tutorial-table-of-contents/)
+
+[Creating a DOOM-style 3D Game in Python from Scratch. Pygame Tutorial - YouTube](https://www.youtube.com/watch?v=ECqUrT7IdqQ)
