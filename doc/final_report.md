@@ -21,7 +21,7 @@
 
 > 例如 player 模块包含 player.inc 和 player.asm，在 player.inc 中定义了 `DrawPlayer` 函数供渲染过程调用，player.asm 中包含了 DrawPlayer 的实现，以及一些模块的私有函数与私有数据。
 
-### 使用GDI接口在窗口上绘图
+### 使用 GDI 接口在窗口上绘图
 
 MASM 32 提供了 `gdi.inc` 与 `gdi.lib`，包含了 [Windows graphics device interface](https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi) (GDI)。GDI 是 Window 提供的低级绘图接口，提供了若干接口用于绘制画面：
 
@@ -59,7 +59,10 @@ MASM 32 提供了 `gdi.inc` 与 `gdi.lib`，包含了 [Windows graphics device i
 
 - 0 表示空地
 - 1,2,3 表示不同贴图的墙体
-- 9 表示怪物
+- 5 表示玩家出生点
+- 7,8,9 表示不同贴图不同血量怪物
+
+支持多张地图的加载，当一张地图的所有怪物死亡后进入下一张地图，没有下一张地图则提示胜利；文件以地图数量开头，之后每张地图先是描述长宽的两个数字，之后是长*宽个数字描述地图详情。地图中至少要有一个怪物；可以没有玩家出生点，若为第一张地图则为默认位置，其他地图没有出生点则保留上一张地图的位置，这可能会导致到达边界之外或卡在墙里，因此建议提供一个位置，多个 5 以最后一个为准。具体样例请见 map.txt 文件。
 
 ### 寻路算法
 
