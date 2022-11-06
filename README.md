@@ -4,6 +4,15 @@
 
 ![](doc/img/game_demo.png)
 
+### 操作方法
+
+- ESC：退出游戏
+- W：向前移动
+- A：向左移动
+- S：向后移动
+- D：向右移动
+- 鼠标：移动视角
+
 ### 编译/运行
 
 直接在 Windows 下运行`exe/doom.exe`
