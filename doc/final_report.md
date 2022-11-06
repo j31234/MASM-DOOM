@@ -2,7 +2,7 @@
 
 > 和嘉晅 徐浩博 董文冲
 
-我们在 Microsoft Assembly 中实现了一个类似于 DOOM 1993 的第一人称射击游戏。
+我们在 Microsoft Assembly 中实现了一个类似于 DOOM 1993 的 3D 射击游戏。
 
 ![](img/game_demo.png)
 
