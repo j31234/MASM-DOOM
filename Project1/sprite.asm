@@ -177,8 +177,10 @@ UpdateNPCAnimation PROC, npcID:DWORD, npcDx:DWORD, npcDy:DWORD, npcType:DWORD
   mov esi, minIndex
   .IF npcType == 0
 	mov eax, hCacoBitmapList[esi * 4]
-  .ELSE
+  .ELSEIF npcType == 1
     mov eax, hCocoBitmapList[esi * 4]
+  .ELSE
+	mov eax, hCucoBitmapList[esi * 4]
   .ENDIF
   mov esi, npcID
 

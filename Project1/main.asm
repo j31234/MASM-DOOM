@@ -96,7 +96,7 @@ WinMain PROC
 	mov hCacoHurt, eax
 
 	IDB_NPC2 = 178
-	INVOKE LoadBitmap, hInstance, IDB_NPC1
+	INVOKE LoadBitmap, hInstance, IDB_NPC2
 	mov hNPC2, eax
 
 	IDB_NPC2_ATTACK = 188
@@ -110,6 +110,22 @@ WinMain PROC
 	IDB_NPC2_HURT = 190
 	INVOKE LoadBitmap, hInstance, IDB_NPC2_HURT
 	mov hCocoHurt, eax
+
+	IDB_NPC3 = 191
+	INVOKE LoadBitmap, hInstance, IDB_NPC3
+	mov hNPC3, eax
+
+	IDB_NPC3_ATTACK = 200
+	INVOKE LoadBitmap, hInstance, IDB_NPC3_ATTACK
+	mov hCucoAttack, eax
+
+	IDB_NPC3_DEATH = 201
+	INVOKE LoadBitmap, hInstance, IDB_NPC3_DEATH
+	mov hCucoDeath, eax
+
+	IDB_NPC3_HURT = 202
+	INVOKE LoadBitmap, hInstance, IDB_NPC3_HURT
+	mov hCucoHurt, eax
 
 	; Load 6 bitmaps for weapon animation
 	mov ebx, 0
@@ -135,6 +151,15 @@ WinMain PROC
 		mov eax, cocoIDBList[ebx * TYPE cocoIDBList]
 		INVOKE LoadBitmap, hInstance, eax
 		mov hCocoBitmapList[ebx * TYPE hCocoBitmapList], eax
+		inc ebx
+	.ENDW
+
+	; Load 8 bitmaps for cuco animation
+	mov ebx, 0
+	.WHILE ebx < 8
+		mov eax, cucoIDBList[ebx * TYPE cucoIDBList]
+		INVOKE LoadBitmap, hInstance, eax
+		mov hCucoBitmapList[ebx * TYPE hCucoBitmapList], eax
 		inc ebx
 	.ENDW
 

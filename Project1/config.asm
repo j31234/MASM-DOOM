@@ -15,6 +15,7 @@ hTexture3 DWORD ?
 hBackground DWORD ?
 hNPC1 DWORD ?
 hNPC2 DWORD ?
+hNPC3 DWORD ?
 weaponIDBList DWORD 131, 132, 133, 134, 135, 136
 hWeaponBitmapList DWORD 6 DUP(?)
 cacoIDBList DWORD 153, 154, 155, 156, 157, 158, 159, 160
@@ -27,6 +28,11 @@ hCocoBitmapList DWORD 8 DUP(?)
 hCocoAttack DWORD ?
 hCocoHurt DWORD ?
 hCocoDeath DWORD ?
+cucoIDBList DWORD 192, 193, 194, 195, 196, 197, 198, 199
+hCucoBitmapList DWORD 8 DUP(?)
+hCucoAttack DWORD ?
+hCucoHurt DWORD ?
+hCucoDeath DWORD ?
 bloodIDBList DWORD 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172
 hBloodBitmapList DWORD 11 DUP(?)
 hEnd DWORD ?

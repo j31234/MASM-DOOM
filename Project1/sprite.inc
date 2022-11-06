@@ -10,7 +10,7 @@ NPC STRUCT
 	blood DWORD 100
 	attacking DWORD 0
 	attackedFrame DWORD 0
-	NPCType DWORD 1
+	NPCType DWORD 2
 NPC ENDS
 
 EXTERNDEF NPCList: NPC

@@ -332,8 +332,10 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 		.IF ebx == 1
 			.IF NPCType == 0
 				mov eax, hCacoAttack
-			.ELSE
+			.ELSEIF NPCType == 1
 				mov eax, hCocoAttack
+			.ELSEIF NPCType == 2
+				mov eax, hCucoAttack
 			.ENDIF
 		.ENDIF
 		; if being attacked
@@ -345,8 +347,10 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 			mov (NPC PTR NPCList[esi]).attackedFrame, ebx
 			.IF NPCType == 0
 				mov eax, hCacoHurt
-			.ELSE
+			.ELSEIF NPCType == 1
 				mov eax, hCocoHurt
+			.ELSE
+				mov eax, hCucoHurt
 			.ENDIF
 		.ENDIF
 		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
@@ -358,8 +362,10 @@ DrawSingleNPC Proc, hdc:HDC, drawdc:HDC, npcID:DWORD
 		
 		.IF NPCType == 0
 			mov eax, hCacoDeath
-		.ELSE
+		.ELSEIF NPCType == 1
 			mov eax, hCocoDeath
+		.ELSE
+			mov eax, hCucoDeath
 		.ENDIF
 		INVOKE DrawNPCBitmap, hdc, drawdc, posX, posY, projWidth, projHeight, eax, normDistInt
 		popad

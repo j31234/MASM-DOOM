@@ -145,6 +145,78 @@
     <Image Include="res\index2.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\cuco.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_0.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_2.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_3.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_4.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_5.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_6.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_7.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_attack.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_death.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\cuco_hurt.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_0.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_1.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_2.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_3.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_4.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_5.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_6.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_7.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_attack.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_death.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\coco_hurt.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="main.asm">
