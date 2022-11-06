@@ -20,5 +20,6 @@ EXTERNDEF NPCAliveNum: DWORD
 GetSprite Proto, posX:PTR DWORD, posY:PTR DWORD, projWidth:PTR DWORD, projHeight:PTR DWORD, normDist:PTR REAL8, normDistInt:PTR DWORD, delta_res:PTR REAL8, dist_res:PTR REAL8, npcID:DWORD
 MoveNPC Proto, npcID:DWORD
 NPCDamage Proto, damage:DWORD, npcID:DWORD
+ClearNPC Proto
 CreateNPC Proto, currow:DWORD, curcol:DWORD, NPCtype:DWORD
 ENDIF

@@ -30,6 +30,9 @@ ROW DWORD ?
 COLUMN DWORD ?
 mapData BYTE 10000 DUP(?)
 mapFile BYTE "map.txt", 0
+mapFPTR DWORD ?
+mapNum DWORD -1
+curMapNum DWORD 0
 filemode BYTE "r", 0
 inputStr BYTE "%d", 0
 
@@ -38,12 +41,27 @@ eps REAL8 0.000001
 .code
 ; Read map data from file
 InitMap Proc
-    LOCAL CurRow:DWORD, CurCol:DWORD, MapPos:PTR BYTE, mapFPTR:DWORD
-	mov CurRow, 0
-  	INVOKE fopen, ADDR mapFile, ADDR filemode
-	mov mapFPTR, eax
+	LOCAL CurRow:DWORD, CurCol:DWORD, MapPos:PTR BYTE
+	mov eax, curMapNum
+	.IF eax == mapNum
+		.IF mapFPTR != 0
+			INVOKE fclose, mapFPTR
+			mov mapFPTR, 0
+		.ENDIF
+		mov eax, 0
+		RET
+	.ENDIF
+	.IF mapNum == -1
+  		INVOKE fopen, ADDR mapFile, ADDR filemode
+		mov mapFPTR, eax
+		INVOKE fscanf, mapFPTR, ADDR inputStr, ADDR mapNum
+	.ELSE
+		INVOKE ClearNPC
+	.ENDIF
 	INVOKE fscanf, mapFPTR, ADDR inputStr, ADDR ROW
 	INVOKE fscanf, mapFPTR, ADDR inputStr, ADDR COLUMN
+	inc curMapNum
+	mov CurRow, 0
 	  ROWLP:
 	  mov CurCol, 0
 	    COLLP:
@@ -71,7 +89,7 @@ InitMap Proc
 	  mov eax, ROW
 	  cmp CurRow, eax
 	  jne ROWLP
-	INVOKE fclose, mapFPTR
+	mov eax, 1
 	ret
 InitMap ENDP
 

@@ -51,6 +51,11 @@ BFSPreNode_SIZE = 128 * 128
 BFSPreNode POINT BFSPreNode_SIZE DUP(<?,?>) ; 1024 * 1024, for fast index
 
 .code
+ClearNPC PROC
+	mov NPCNum, 0
+	RET
+ClearNPC ENDP
+
 CreateNPC PROC, currow:DWORD, curcol:DWORD, NPCtype:DWORD
 	local npcindex:DWORD
 	

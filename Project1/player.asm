@@ -247,7 +247,12 @@ playerStateCheck PROC
 
 	; win check
 	.IF NPCAliveNum == 0
-		mov eax, 3
+		INVOKE InitMap
+		.IF eax == 0
+			mov eax, 3
+		.ELSE
+			mov eax, 1
+		.ENDIF
 		jmp ExitPlayerStateCheck
 	.ENDIF
 
