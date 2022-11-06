@@ -217,6 +217,9 @@
     <Image Include="res\coco_hurt.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\next_stage.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="main.asm">

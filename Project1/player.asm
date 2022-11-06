@@ -19,6 +19,7 @@ includelib msvcrt.lib
 include player.inc
 include config.inc
 include map.inc
+include draw.inc
 include sprite.inc
 include sound.inc
 
@@ -265,6 +266,7 @@ playerStateCheck PROC
 		.IF eax == 0
 			mov eax, 3
 		.ELSE
+			mov nextStageFrame, 30
 			mov eax, 1
 		.ENDIF
 		jmp ExitPlayerStateCheck

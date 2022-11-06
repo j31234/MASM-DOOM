@@ -40,7 +40,7 @@ winRect   RECT <>
 hMainWnd  DWORD ?
 hInstance DWORD ?
 WINDOW_STYLE = WS_POPUP
-gameState DWORD 1 ; 1/2 for index page & 0 for begin
+indexState DWORD 1 ; 01-39 for index page & 00 for begin
 
 ;=================== CODE =========================
 .code
@@ -78,6 +78,10 @@ WinMain PROC
 	IDB_INDEX2 = 178
 	INVOKE LoadBitmap, hInstance, IDB_INDEX2
 	mov hIndex2, eax
+
+	IDB_NEXTSTAGE = 203
+	INVOKE LoadBitmap, hInstance, IDB_NEXTSTAGE
+	mov hNextStage, eax
 
 	IDB_NPC1 = 111
 	INVOKE LoadBitmap, hInstance, IDB_NPC1
@@ -301,14 +305,14 @@ COMMENT @
 
 	  ; Background = white
 	  INVOKE BitBlt, memHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdc, 0, 0, WHITENESS
-	  .IF gameState == 0
+	  .IF indexState == 0
 		; Draw Main
 		INVOKE DrawMain, memHdc, drawHdc
 		; Index
 	  .ELSE
 		; every 10 frames change the index1 <-> index2
 		xor edx, edx
-	    mov eax, gameState
+	    mov eax, indexState
 		mov ebx, 10
 		div ebx
 		.IF eax < 2
@@ -320,9 +324,9 @@ COMMENT @
 		.ELSE
 			INVOKE SelectObject, drawHdc, hIndex2
 			mov oldObject, eax
-			mov gameState, 0
+			mov indexState, 0
 		.ENDIF
-		add gameState, 1
+		add indexState, 1
 		INVOKE StretchBlt, memHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, drawHdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, SRCCOPY
 		INVOKE SelectObject, drawHdc, oldObject
 	  .ENDIF
@@ -344,7 +348,7 @@ ReleaseResources:
 	  .IF wParam == VK_ESCAPE
 	    INVOKE PostQuitMessage,0
 	  .ELSEIF wParam == VK_SPACE
-		mov gameState, 0
+		mov indexState, 0
 	  .ENDIF
 	  
 	  jmp WinProcExit

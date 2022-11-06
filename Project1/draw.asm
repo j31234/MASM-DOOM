@@ -29,7 +29,7 @@ renderHead DWORD ?
 renderTail DWORD ?
 l DWORD ?
 r DWORD ?
-
+nextStageFrame DWORD 0
 
 .code
 GetRGB Proc, red:BYTE, green:BYTE, blue:BYTE
@@ -439,6 +439,16 @@ DRAW_SINGLE:
 	RET
 DrawBlood ENDP
 
+DrawNextStage PROC hdc:HDC, drawdc:HDC
+	mov eax, nextStageFrame
+	.IF eax > 0
+		INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hNextStage, 0
+		dec eax
+		mov nextStageFrame, eax
+	.ENDIF
+	RET
+DrawNextStage ENDP
+
 DrawMain Proc, hdc:HDC, drawdc:HDC
   pushad
 
@@ -459,6 +469,7 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
 
   ; INVOKE DrawMap, hdc
   INVOKE DrawPlayer, hdc ; TODO: refactor, DrawPlayer now include update player
+  INVOKE DrawNextStage, hdc, drawdc ; check if necessary to show "NEXT STAGE" slogan
   INVOKE DrawBlood, hdc, drawdc
   INVOKE DrawBackground, hdc, drawdc, 0, 0
   INVOKE DrawFloor, hdc
@@ -466,7 +477,6 @@ DrawMain Proc, hdc:HDC, drawdc:HDC
 
   ; Draw Weapon
   INVOKE DrawWeapon, hdc, drawdc
-
   
   INVOKE DrawNPC, hdc, drawdc
 

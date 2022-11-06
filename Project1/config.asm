@@ -37,6 +37,7 @@ bloodIDBList DWORD 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172
 hBloodBitmapList DWORD 11 DUP(?)
 hEnd DWORD ?
 hWin DWORD ?
+hNextStage DWORD ?
 XScale DWORD 80
 YScale DWORD 80
 

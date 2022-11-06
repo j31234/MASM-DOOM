@@ -29,5 +29,6 @@ renderObject ENDS; ¹²11*4¸ö×Ö½Ú
 EXTERNDEF renderList: renderObject
 EXTERNDEF renderHead: DWORD
 EXTERNDEF renderTail: DWORD
+EXTERNDEF nextStageFrame: DWORD
 
 ENDIF

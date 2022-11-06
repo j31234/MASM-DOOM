@@ -128,6 +128,7 @@
     <Image Include="res\game_over.bmp" />
     <Image Include="res\index.bmp" />
     <Image Include="res\index2.bmp" />
+    <Image Include="res\next_stage.bmp" />
     <Image Include="res\num_0.bmp" />
     <Image Include="res\num_1.bmp" />
     <Image Include="res\num_2.bmp" />
