@@ -55,10 +55,13 @@ InitMap Proc
 		INVOKE fscanf, mapFPTR, ADDR inputStr, MapPos
 		mov eax, MapPos
 		mov al, [eax]
-		.IF al == 9
+		.IF al >= 7
+			mov ebx, 0
+			mov bl, al
+			sub bl, 7
 			mov eax, MapPos
 			mov BYTE PTR [eax], 0
-			INVOKE CreateNPC, CurRow, CurCol
+			INVOKE CreateNPC, CurRow, CurCol, ebx
 		.ENDIF
 		inc CurCol
 		mov eax, COLUMN

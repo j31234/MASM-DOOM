@@ -51,7 +51,7 @@ BFSPreNode_SIZE = 128 * 128
 BFSPreNode POINT BFSPreNode_SIZE DUP(<?,?>) ; 1024 * 1024, for fast index
 
 .code
-CreateNPC PROC, currow:DWORD, curcol:DWORD
+CreateNPC PROC, currow:DWORD, curcol:DWORD, NPCtype:DWORD
 	local npcindex:DWORD
 	
 	mov eax, NPCNum
@@ -72,6 +72,18 @@ CreateNPC PROC, currow:DWORD, curcol:DWORD
 	mov ebx, eax
 	mov eax, npcindex
 	mov (NPC PTR NPCList[eax]).posY, ebx
+
+	mov ebx, NPCtype
+	mov eax, npcindex
+	mov (NPC PTR NPCList[eax]).NPCType, ebx
+	
+	mov eax, NPCtype
+	mov ebx, 50
+	mul ebx
+	add eax, 100
+	mov ebx, eax
+	mov eax, npcindex
+	mov (NPC PTR NPCList[eax]).blood, ebx
 
 	inc NPCNum
 	inc NPCAliveNum
