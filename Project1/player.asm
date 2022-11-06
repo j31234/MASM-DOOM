@@ -266,7 +266,7 @@ playerStateCheck PROC
 		.IF eax == 0
 			mov eax, 3
 		.ELSE
-			mov nextStageFrame, 30
+			mov nextStageFrame, 50
 			mov eax, 1
 		.ENDIF
 		jmp ExitPlayerStateCheck

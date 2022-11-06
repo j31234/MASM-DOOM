@@ -388,12 +388,12 @@ NPC_LOOP:
 DrawNPC ENDP
 
 DrawEnd PROC,  hdc:HDC, drawdc:HDC
-	INVOKE DrawBitmap, hdc, drawdc, 0, 0, 800, 600, 0, 0, 1600, 800, hEnd, 0
+	INVOKE DrawBitmap, hdc, drawdc, 0, 0, 800, 600, 0, 0, 1600, 900, hEnd, 0
 	RET
 DrawEnd ENDP
 
 DrawWin PROC,  hdc:HDC, drawdc:HDC
-	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 1800, 800, hWin, 0
+	INVOKE DrawTransparentBitmap, hdc, drawdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, 1920, 1080, hWin, 0
 	RET
 DrawWin ENDP
 
