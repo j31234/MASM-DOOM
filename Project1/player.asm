@@ -33,6 +33,20 @@ speedX DWORD 0
 speedY DWORD 0
 
 .code
+SetPlayerPos PROC, currow:DWORD, curcol:DWORD
+	mov eax, currow
+	mov ebx, XScale
+	mul ebx
+	mov playerX, eax
+	
+	mov eax, curcol
+	mov ebx, YScale
+	mul ebx
+	mov playerY, eax
+
+	RET
+SetPlayerPos ENDP
+
 UpdatePlayerAngle PROC
   LOCAL cursorPos:POINT, dAngle: DWORD, temp:SDWORD
   INVOKE GetCursorPos, ADDR cursorPos

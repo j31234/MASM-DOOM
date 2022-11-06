@@ -80,6 +80,10 @@ InitMap Proc
 			mov eax, MapPos
 			mov BYTE PTR [eax], 0
 			INVOKE CreateNPC, CurRow, CurCol, ebx
+		.ELSEIF al == 5
+			mov eax, MapPos
+			mov BYTE PTR [eax], 0
+			INVOKE SetPlayerPos, CurRow, CurCol
 		.ENDIF
 		inc CurCol
 		mov eax, COLUMN

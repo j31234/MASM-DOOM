@@ -3,6 +3,7 @@ PLAYER_INC equ <1>
 
 include windows.inc
 
+SetPlayerPos Proto, newX:DWORD, newY:DWORD
 DrawPlayer Proto, hdc: HDC
 playerStateCheck Proto
 
